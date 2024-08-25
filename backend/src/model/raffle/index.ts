@@ -1,11 +1,4 @@
-import {
-  getModelForClass,
-  modelOptions,
-  prop,
-  Ref,
-} from "@typegoose/typegoose";
-
-import { User } from "../user";
+import { getModelForClass, modelOptions, prop } from "@typegoose/typegoose";
 
 @modelOptions({
   schemaOptions: { timestamps: true },
@@ -14,25 +7,19 @@ export class Raffle {
   @prop({ required: true })
   title: string;
 
-  @prop({ required: true, ref: "User" })
-  creator!: Ref<User>;
+  @prop({ required: true })
+  creatorEmail: string;
 
   @prop({ required: true })
-  noOfpossibleWinners: number;
+  noOfPossibleWinners: number;
 
-  @prop({
-    ref: "User",
-    type: () => [User],
-    uniqueItems: true,
-  })
-  participants: Ref<User>[];
+  @prop({ default: 0 })
+  participantCount: number;
 
-  @prop({
-    ref: "User",
-    type: () => [User],
-    uniqueItems: true,
-  })
-  winners: Ref<User>[];
+  @prop({ default: 0 })
+  winnerCount: number;
 }
+
 const RaffleModel = getModelForClass(Raffle);
+
 export default RaffleModel;

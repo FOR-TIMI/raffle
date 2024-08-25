@@ -15,4 +15,9 @@ export default {
     port: 587,
     secure: false,
   },
+  allowedOrigins: [
+    "http://localhost:3000",
+    "http://localhost:8080",
+    "https://yourdomain.com",
+  ],
 };

@@ -1,13 +1,15 @@
 import express from "express";
-
 import {
   createRaffleHandler,
   deleteRaffleHandler,
+  getParticipantsHandler,
   getRaffleDetailsHandler,
   getUserJoinedRafflesHandler,
   getUserRafflesHandler,
+  getWinnersHandler,
   joinRaffleHandler,
   removeParticipantFromRaffleHandler,
+  resetRaffleHandler,
   spinRaffleHandler,
 } from "../../controller/raffle";
 
@@ -15,9 +17,18 @@ import isRaffleCreator from "../../middleware/raffleAuthor";
 import requireUser from "../../middleware/requireUser";
 import validateResource from "../../middleware/validate";
 
+import { conditionalValidateResourceIfSignedIn } from "../../middleware/conditionalValidateSignedIn";
 import {
   createRaffleSchema,
+  GetParticipantsParams,
+  GetParticipantsQuery,
+  getParticipantsSchema,
   getRaffleDetailsSchema,
+  getWinnersSchema,
+  joinRaffleSchema,
+  removeParticipantFromRaffleSchema,
+  ResetRaffleParams,
+  resetRaffleSchema,
   spinRaffleSchema,
 } from "../../schemas/raffle";
 
@@ -32,22 +43,23 @@ router.get(baseEndpoint, requireUser, getUserRafflesHandler);
 /** Create new raffle */
 router.post(
   baseEndpoint,
-  requireUser,
   validateResource(createRaffleSchema),
   createRaffleHandler
 );
 
 /** Add new participant */
-router.get(buildEndpoint(":raffleId/join"), requireUser, joinRaffleHandler);
+router.post(
+  buildEndpoint(":raffleId/join"),
+  conditionalValidateResourceIfSignedIn(joinRaffleSchema),
+  joinRaffleHandler
+);
 
 /** Get all user joined raffles */
 router.get(buildEndpoint("joined"), requireUser, getUserJoinedRafflesHandler);
 
-/** Allow only creator and participants to get access to raffles/raffleId */
 /** Get raffle details */
 router.get(
   buildEndpoint(":raffleId"),
-  requireUser,
   validateResource(getRaffleDetailsSchema),
   getRaffleDetailsHandler
 );
@@ -62,9 +74,10 @@ router.delete(
 
 /** Remove Participant from raffle */
 router.delete(
-  buildEndpoint(":raffleId/participants/:participantId"),
+  buildEndpoint(":raffleId/participants/:participantEmail"),
   requireUser,
   isRaffleCreator,
+  validateResource(removeParticipantFromRaffleSchema),
   removeParticipantFromRaffleHandler
 );
 
@@ -75,6 +88,29 @@ router.get(
   isRaffleCreator,
   validateResource(spinRaffleSchema),
   spinRaffleHandler
+);
+
+/** Get participants */
+router.get<GetParticipantsParams, {}, {}, GetParticipantsQuery>(
+  buildEndpoint(":raffleId/participants"),
+  validateResource(getParticipantsSchema),
+  getParticipantsHandler
+);
+
+/* Get winners */
+router.get(
+  buildEndpoint(":raffleId/winners"),
+  validateResource(getWinnersSchema),
+  getWinnersHandler
+);
+
+/** Reset Raffle */
+router.get<ResetRaffleParams>(
+  buildEndpoint(":raffleId/reset"),
+  requireUser,
+  isRaffleCreator,
+  validateResource(resetRaffleSchema),
+  resetRaffleHandler
 );
 
 export default router;
