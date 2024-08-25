@@ -7,6 +7,7 @@ export default {
   refreshTokenTtl: "7d",
   accessTokenPrivateKey: "",
   refreshTokenPrivateKey: "",
+  uiBaseUrl: "http://localhost:3000",
   smtp: {
     user: "hftwu44la5m4ux7g@ethereal.email",
     pass: "xbXyhfPwyd3RXGdwN3",

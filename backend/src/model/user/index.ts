@@ -5,11 +5,13 @@ import {
   modelOptions,
   pre,
   prop,
+  Ref,
   Severity,
 } from "@typegoose/typegoose";
 import argon2 from "argon2";
 import { nanoid } from "nanoid";
 import log from "../../utils/Logger";
+import { Raffle } from "../raffle";
 
 export const privateFields = [
   "password",
@@ -29,12 +31,22 @@ export const privateFields = [
 })
 @index({ email: 1 })
 @modelOptions({
-  schemaOptions: { timestamps: true },
+  schemaOptions: {
+    timestamps: true,
+    toJSON: {
+      transform: (doc, ret) => {
+        privateFields.forEach((field) => {
+          delete ret[field];
+          return ret;
+        });
+      },
+    },
+  },
   options: {
     allowMixed: Severity.ALLOW,
   },
 })
-export class User {
+class User {
   @prop({ lowercase: true, required: true, unique: true })
   email: string;
 
@@ -56,6 +68,12 @@ export class User {
   @prop({ default: false })
   verifiedEmail: boolean;
 
+  @prop({ ref: () => Raffle })
+  createdRaffles: Ref<Raffle>[];
+
+  @prop({ ref: () => Raffle })
+  joinedRaffles: Ref<Raffle>[];
+
   async verifyPassword(
     this: DocumentType<User>,
     suppliedPassword: string
@@ -69,6 +87,6 @@ export class User {
   }
 }
 
-const UserModel = getModelForClass(User);
-
+export const UserModel = getModelForClass(User);
+export { User };
 export default UserModel;

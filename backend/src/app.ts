@@ -13,6 +13,7 @@ const port = config.get<number>("port");
 const baseRoute = config.get<string>("baseRoute");
 
 app.use(express.json());
+
 app.use(deserializeUser);
 app.use(baseRoute, router);
 
