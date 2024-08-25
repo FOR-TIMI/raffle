@@ -1,16 +1,16 @@
 import { NextFunction, Request, Response } from "express";
-import { getUserRaffle } from "../../service/raffle";
+import { getOneRaffle } from "../../service/raffle";
 
 const isRaffleCreator = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const userId = res.locals.user._id;
+  const creatorEmail = res.locals.user.email;
   const raffleId = req.params.raffleId;
 
   try {
-    const userRaffles = await getUserRaffle(userId);
+    const userRaffles = await getOneRaffle(creatorEmail);
 
     // Check if the raffleId from params matches any of the user's raffles
     const isAuthor = userRaffles.some(
