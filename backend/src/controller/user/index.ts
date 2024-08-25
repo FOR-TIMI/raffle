@@ -1,3 +1,4 @@
+import { error } from "console";
 import { Request, Response } from "express";
 import { nanoid } from "nanoid";
 import {
@@ -26,13 +27,13 @@ export async function createUserHandler(
       text: `Verification code ${user.verificationCode}, Identity ${user.id}`,
     });
 
-    return res.send("User created successfully");
+    return res.status(201).json({ message: "User created successfully" });
   } catch (e: any) {
     if (e.code === 11000) {
-      return res.status(409).send("User already exists");
+      return res.status(409).json({ message: "User already exists" });
     }
 
-    return res.status(500).send(e);
+    return res.status(500).json({ message: "Internal server error", error: e });
   }
 }
 
@@ -45,20 +46,20 @@ export async function verifyUserHandler(
   const user = await findUserById(id);
 
   if (!user) {
-    return res.send("Could not verify user");
+    return res.status(400).json({ message: "Could not verify user" });
   }
 
   if (user.verifiedEmail) {
-    return res.send("User is already verified");
+    return res.status(200).send({ message: "User is already verified" });
   }
 
   if (user.verificationCode === verificationCode) {
     user.verifiedEmail = true;
     await user.save();
-    return res.send("User verified successfully");
+    return res.status(201).json({ message: "User verified successfully" });
   }
 
-  return res.send("Could not verify user");
+  return res.status(500).json({ message: "Could not verify user" });
 }
 
 export async function forgotPasswordHandler(
@@ -74,12 +75,12 @@ export async function forgotPasswordHandler(
 
   if (!user) {
     log.debug(`user with email ${email} not found`);
-    return res.send(email);
+    return res.status(201).json({ message: errorMessage });
   }
 
   if (!user.verifiedEmail) {
     log.debug(`user with email ${email} not verified`);
-    return res.send(errorMessage);
+    return res.status(201).json({ message: errorMessage });
   }
 
   const passwordResetCode = nanoid();
@@ -96,7 +97,7 @@ export async function forgotPasswordHandler(
 
   log.debug(`Password reset code sent to ${email}`);
 
-  return res.send(errorMessage);
+  return res.status(201).json({ message: errorMessage });
 }
 
 export async function resetPasswordHandler(
@@ -117,7 +118,7 @@ export async function resetPasswordHandler(
     !user.passwordResetCode ||
     user.passwordResetCode !== passwordResetCode
   ) {
-    return res.status(400).send("Could not reset password");
+    return res.status(400).json({ message: "Could not reset password" });
   }
 
   user.passwordResetCode = null;
@@ -125,11 +126,11 @@ export async function resetPasswordHandler(
 
   await user.save();
 
-  return res.send("Password reset successful");
+  return res.status(201).json({ message: "Password reset successful" });
 }
 
 export async function getSignedInUserHandler(req: Request, res: Response) {
   const user = res.locals.user;
 
-  return res.send(user);
+  return res.status(200).json(user);
 }
