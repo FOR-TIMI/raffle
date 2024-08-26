@@ -1,0 +1,25 @@
+{
+  "name": "raffle",
+  "version": "1.0.0",
+  "description": "MERN stack raffle draw application that allows users to create raffles, generate QR codes for participant entry, and draw winners with engaging animations. It’s secure, scalable, and lets users save raffles on mobile for easy reuse",
+  "main": "backend/src/app.js",
+  "scripts": {
+    "start": "npm run start-server",
+    "start-server": "node backend/src/app.js",
+    "start:local": "concurrently \"cd backend && npm run dev\" \"cd ui && npm start\"",
+    "dev": "concurrently \"cd backend && npm run dev\" \"cd ui && npm start\"",
+    "install": "cd backend && npm i && cd ../ui && npm i",
+    "postinstall": "npm run build:local",
+    "build": "cd backend && npm run build && cd ../ui && npm run build",
+    "build:local": "cd backend && npm run build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "raffle": "file:"
+  },
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  }
+}

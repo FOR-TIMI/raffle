@@ -134,3 +134,15 @@ export async function getSignedInUserHandler(req: Request, res: Response) {
 
   return res.status(200).json(user);
 }
+
+export async function emailExistsHandler(req: Request, res: Response) {
+  const email = req.body.email as string;
+
+  const user = await findUserByEmail(email);
+
+  if (user) {
+    return res.status(200).json({ message: "Email exists" });
+  }
+
+  return res.status(404).json({ message: "Email does not exist" });
+}

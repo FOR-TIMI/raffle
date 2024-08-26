@@ -38,6 +38,13 @@ export async function createSessionHandler(
   const accessToken = signAccessToken(user);
   const refreshToken = await signRefreshToken({ userId: user.id });
 
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+  });
+
   return res.send({ accessToken, refreshToken });
 }
 

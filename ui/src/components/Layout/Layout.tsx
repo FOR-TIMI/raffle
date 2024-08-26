@@ -12,7 +12,7 @@ const Layout: React.FC<Props> = ({ children }) => {
     <div className="p-0 h-0">
       <NavBar />
       <div className="layout-content">
-        <main className=" bg-[#282828]">{children}</main>
+        <main className=" ">{children}</main>
       </div>
     </div>
   );

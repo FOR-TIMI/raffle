@@ -54,6 +54,14 @@ export const resetPasswordSchema = object({
   }),
 });
 
+export const checkEmailSchema = object({
+  body: object({
+    email: string({ required_error: "Email is required" }).email(
+      "Invalid email"
+    ),
+  }),
+});
+
 export type CreateUserRequest = TypeOf<typeof createUserSchema>["body"];
 export type VerifyUserRequest = TypeOf<typeof verifyUserSchema>["params"];
 export type ForgotPasswordRequest = TypeOf<typeof forgotPasswordSchema>["body"];
