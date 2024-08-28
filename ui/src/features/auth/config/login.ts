@@ -11,12 +11,8 @@ export const loginUserAPI = async (
     email,
     password,
   });
-  return response.data; // Expecting { user, accessToken, refreshToken }
-};
 
-export const signUpUserAPI = async ({}): Promise<LoginResponse> => {
-  const response = await axiosInstance.post<LoginResponse>("/signup", {});
-  return response.data;
+  return response?.data; // Expecting { accessToken, refreshToken }
 };
 
 export const refreshAccessTokenAPI = async (
@@ -24,7 +20,8 @@ export const refreshAccessTokenAPI = async (
 ): Promise<RefreshTokenResponse> => {
   const response = await axiosInstance.post<RefreshTokenResponse>(
     "/sessions/refresh",
-    { refreshToken }
+    { refreshToken },
+    { withCredentials: true }
   );
   return response.data; // Expecting { accessToken, user }
 };

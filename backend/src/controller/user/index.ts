@@ -1,4 +1,3 @@
-import { error } from "console";
 import { Request, Response } from "express";
 import { nanoid } from "nanoid";
 import {
@@ -18,11 +17,16 @@ export async function createUserHandler(
   const body = req.body;
 
   try {
-    const user = await createUser(body);
+    const user = await createUser({
+      email: body.email.toLowerCase().trim(),
+      firstName: body.firstName.trim(),
+      lastName: body.lastName.trim(),
+      password: body.password,
+    });
 
     await MailService.sendEmail({
       from: "timicancode@gmail.com",
-      to: user.email,
+      to: user.email.trim(),
       subject: "Please verify your account",
       text: `Verification code ${user.verificationCode}, Identity ${user.id}`,
     });
@@ -43,7 +47,7 @@ export async function verifyUserHandler(
 ) {
   const { id, verificationCode } = req.params;
 
-  const user = await findUserById(id);
+  const user = await findUserById(id.trim());
 
   if (!user) {
     return res.status(400).json({ message: "Could not verify user" });
@@ -66,7 +70,8 @@ export async function forgotPasswordHandler(
   req: Request<{}, {}, ForgotPasswordRequest>,
   res: Response
 ) {
-  const { email } = req.body;
+  const { email: emailWithoutrim } = req.body;
+  const email = emailWithoutrim.trim();
   log.info(email);
   const errorMessage =
     "If a user with this email exists, a password reset link has been sent to the email";
@@ -136,7 +141,7 @@ export async function getSignedInUserHandler(req: Request, res: Response) {
 }
 
 export async function emailExistsHandler(req: Request, res: Response) {
-  const email = req.body.email as string;
+  const email = req.body.email.trim() as string;
 
   const user = await findUserByEmail(email);
 

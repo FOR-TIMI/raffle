@@ -3,7 +3,6 @@ import {
   InputAdornment,
   TextField as MuiTextField,
   SxProps,
-  useTheme,
 } from "@mui/material";
 import React, { useMemo } from "react";
 import { MdVisibility, MdVisibilityOff } from "react-icons/md";

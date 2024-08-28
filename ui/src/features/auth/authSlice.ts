@@ -1,25 +1,30 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AuthState, LoginResponse } from "../../types";
+import {
+  getAuthCookies,
+  removeAuthCookies,
+  setAuthCookies,
+} from "./config/cookies";
 import { loginUserAPI } from "./config/login";
 
 const initialState: AuthState = {
-  user: null,
   accessToken: null,
   refreshToken: null,
-  loading: false,
+  isAuthenticated: false,
   error: null,
+  status: "idle",
 };
 
-// Async thunk for logging in
 export const loginUser = createAsyncThunk<
   LoginResponse,
   { email: string; password: string }
->("auth/loginUser", async ({ email, password }, { rejectWithValue }) => {
+>("", async ({ email, password }, { rejectWithValue }) => {
   try {
     const data = await loginUserAPI(email, password);
-    return data; // Expecting { user, accessToken, refreshToken }
+    setAuthCookies(data.accessToken, data.refreshToken);
+    return data;
   } catch (error) {
-    return rejectWithValue((error as any).response.data);
+    return rejectWithValue((error as any).response?.data);
   }
 });
 
@@ -28,30 +33,50 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     logout(state) {
-      state.user = null;
       state.accessToken = null;
       state.refreshToken = null;
       state.error = null;
+      state.isAuthenticated = false;
+      removeAuthCookies();
+    },
+    setAuthenticated(state, action: PayloadAction<boolean>) {
+      state.isAuthenticated = action.payload;
+    },
+    updateTokens(
+      state,
+      action: PayloadAction<{ accessToken: string; refreshToken: string }>
+    ) {
+      const { accessToken, refreshToken } = getAuthCookies();
+      if (accessToken && refreshToken) {
+        state.isAuthenticated = true;
+      } else {
+        state.isAuthenticated = false;
+      }
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(loginUser.pending, (state) => {
-        state.loading = true;
+        state.status = "loading";
         state.error = null;
       })
-      .addCase(loginUser.fulfilled, (state, action) => {
-        state.loading = false;
-        state.user = action.payload.user;
-        state.accessToken = action.payload.accessToken;
-        state.refreshToken = action.payload.refreshToken;
-      })
+      .addCase(
+        loginUser.fulfilled,
+        (state, action: PayloadAction<LoginResponse>) => {
+          state.status = "succeeded";
+          state.accessToken = action.payload.accessToken;
+          state.isAuthenticated = true;
+          state.refreshToken = action.payload.refreshToken;
+          state.error = null;
+        }
+      )
       .addCase(loginUser.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
+        state.status = "failed";
+        state.error = action.error.message || "An error occurred";
+        console.log("FAILED state", action.payload);
       });
   },
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, setAuthenticated } = authSlice.actions;
 export default authSlice.reducer;

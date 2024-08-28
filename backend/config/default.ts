@@ -20,4 +20,5 @@ export default {
     "http://localhost:8080",
     "https://yourdomain.com",
   ],
+  cookieDomain: "localhost",
 };
