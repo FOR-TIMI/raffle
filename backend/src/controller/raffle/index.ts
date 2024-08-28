@@ -37,7 +37,7 @@ export async function createRaffleHandler(
 
   try {
     const raffleData = {
-      title,
+      title: title.trim(),
       noOfPossibleWinners,
       creatorEmail: signedInUser.email,
     };
@@ -64,25 +64,28 @@ export async function joinRaffleHandler(
   res: Response
 ) {
   const { raffleId } = req.params;
-  const signedInUser = res.locals.user;
-  const participantData = signedInUser
-    ? {
-        email: signedInUser.email,
-        firstName: signedInUser.firstName,
-        lastName: signedInUser.lastName,
-      }
-    : req.body;
-
+  const participantData = {
+    email: req.body.email.trim(),
+    firstName: req.body.firstName.trim(),
+    lastName: req.body.lastName.trim(),
+  };
   try {
-    const raffle = await RaffleModel.findById(raffleId);
+    if (!raffleId)
+      return res.status(400).json({ message: "Raffle ID is required" });
+
+    const raffle = await RaffleModel.findOne({ _id: raffleId });
     if (!raffle) {
       return res.status(404).json({ message: "Raffle not found" });
     }
 
+    console.log("payload", participantData);
+
     const existingParticipant = await RaffleParticipantModel.findOne({
-      raffle: raffleId,
+      raffle: raffle._id,
       email: participantData.email,
     });
+
+    console.log("existingParticipant", existingParticipant);
 
     if (existingParticipant) {
       return res

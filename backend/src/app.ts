@@ -7,6 +7,8 @@ import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import { Server } from "http";
 import deserializeUser from "./middleware/deserialize";
+import purify from "./middleware/domPurify";
+import sanitizerMongo from "./middleware/sanitize";
 import router from "./routes";
 import connectDB from "./utils/Db";
 import { errorHandler } from "./utils/Error/request-handler";
@@ -26,12 +28,15 @@ const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
 });
+app.use(sanitizerMongo());
+app.use(purify());
 app.use(limiter);
 
 // CORS configuration
 const corsOptions = {
   origin: config.get<string[]>("allowedOrigins"),
   optionsSuccessStatus: 200,
+  credentials: true,
 };
 app.use(cors(corsOptions));
 

@@ -17,4 +17,5 @@ export default {
     clientSecret: "GOOGLE_CLIENT_SECRET",
     callbackURL: "GOOGLE_CALLBACK_URL",
   },
+  cookieDomain: "COOKIE_DOMAIN",
 };

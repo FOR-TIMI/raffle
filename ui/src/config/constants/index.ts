@@ -5,6 +5,9 @@ export const PAGE_ROUTES = {
   FORGOT_PASSWORD: "/forgot-password",
   RESET_PASSWORD: "/users/resetPassword",
   CHECK_EMAIL_AVAILABILITY: "/users/checkemail",
+  ONE_DRAW: "/draws/:id",
+  CREATE_RAFFLE: "create",
+  ADD_PARTICIPANT: "add-participant",
 };
 
 export const USER_API_ROUTES = {
@@ -16,4 +19,19 @@ export const USER_API_ROUTES = {
   VERIFY_EMAIL: "/users/verify/:id/:verificationCode",
   REFRESH_TOKEN: "/sessions/refresh",
   GET_USER: "/users/me",
+};
+
+export const RAFFLES_API_ROUTES = {
+  GET_USER_RAFFLES: "/raffles",
+  CREATE_RAFFLE: "/raffles",
+  ADD_PARTICIPANT: "/raffles/:raffleId/join",
+  GET_USER_JOINED_RAFFLES: "/raffles/joined",
+  GET_RAFFLE_DETAILS: "/raffles/:raffleId",
+  DELETE_RAFFLE: "/raffles/:raffleId",
+  REMOVE_RAFFLE_PARTICIPANT:
+    "/raffles/:raffleId/participants/:participantEmail",
+  SPIN_RAFFLE: "/raffles/:raffleId/spin",
+  GET_RAFFLE_PARTICIPANTS: "/raffles/:raffleId/participants",
+  GET_RAFFLE_WINNERS: "/raffles/:raffleId/winners",
+  RESET_RAFFLE: "/raffles/:raffleId/reset",
 };
