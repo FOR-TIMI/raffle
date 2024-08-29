@@ -18,4 +18,5 @@ export default {
     callbackURL: "GOOGLE_CALLBACK_URL",
   },
   cookieDomain: "COOKIE_DOMAIN",
+  uiBaseUrl: "UI_BASE_URL",
 };

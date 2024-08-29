@@ -18,7 +18,10 @@ export default {
   allowedOrigins: [
     "http://localhost:3000",
     "http://localhost:8080",
-    "https://yourdomain.com",
+    "https://raffle-zeta-eight.vercel.app/",
+    "https://raffle-mu.vercel.app/",
   ],
   cookieDomain: "localhost",
 };
+
+
