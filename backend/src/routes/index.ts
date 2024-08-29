@@ -7,7 +7,7 @@ import userRouter from "./user";
 
 const router = express.Router();
 
-router.get("/healthcheck", (_, res) => res.send(200));
+router.get("/healthcheck", (_, res) => res.send('Online'));
 
 router.use(userRouter);
 router.use(authRouter);
