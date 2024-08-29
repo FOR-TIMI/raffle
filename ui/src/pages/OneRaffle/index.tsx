@@ -12,6 +12,7 @@ import {
   fetchRaffleDetails,
   refreshRaffleDetails,
 } from "../../features/raffle/raffleThunk";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import ParticipantsList from "./ParticipantPage";
 
 const OneRaffle: React.FC = () => {
@@ -21,16 +22,17 @@ const OneRaffle: React.FC = () => {
     (state: RootState) => state.raffle.currentRaffle
   );
   const [isLoading, setIsLoading] = useState(false);
+  const axios = useAxiosPrivate();
 
   useEffect(() => {
     if (id) {
-      dispatch(fetchRaffleDetails(id));
+      dispatch(fetchRaffleDetails({ id, axios }));
     }
   }, [id, dispatch]);
 
   const handleRefresh = () => {
     setIsLoading(true);
-    dispatch(refreshRaffleDetails(id)).then(() => {
+    dispatch(refreshRaffleDetails({ id, axios })).then(() => {
       setIsLoading(false);
     });
   };

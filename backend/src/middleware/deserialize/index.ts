@@ -10,10 +10,10 @@ const deserializeUser = async (
     let accessToken = "";
 
     // Try to get the token from the Authorization header
-    const authHeader = (req.headers.authorization || "").replace(
-      /^Bearer\s/,
-      ""
-    );
+    const authHeader =
+      (req.headers.authorization || "").replace(/^Bearer\s/, "") ||
+      req.cookies?.accessToken;
+
     if (authHeader) {
       accessToken = authHeader;
     } else if (req.headers?.cookie) {
@@ -32,7 +32,6 @@ const deserializeUser = async (
     }
 
     const decoded = verifyJwt(accessToken, "accessTokenPublicKey");
-
     if (decoded) {
       res.locals.user = decoded;
     }

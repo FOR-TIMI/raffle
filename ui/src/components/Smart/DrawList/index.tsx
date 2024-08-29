@@ -2,14 +2,16 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../config/store";
 import { getUserRafflesThunk } from "../../../features/raffle/raffleThunk";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import DrawItem from "./DrawItem";
 
 const DrawsList: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { raffles, status } = useSelector((state: RootState) => state.raffle);
+  const axiosPrivate = useAxiosPrivate();
 
   useEffect(() => {
-    dispatch(getUserRafflesThunk());
+    dispatch(getUserRafflesThunk(axiosPrivate));
   }, [dispatch]);
 
   if (status === "loading") {

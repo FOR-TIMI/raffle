@@ -1,40 +1,48 @@
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import { LuPartyPopper } from "react-icons/lu";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import winnerBannerimg from "../../../assets/image/winner-banner.png";
-import { RootState } from "../../../config/store";
+import { AppDispatch, RootState } from "../../../config/store";
+import { spinRaffleThunk } from "../../../features/raffle/raffleThunk";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
+import WinnersList from "./WinnersList";
 
-type Props = {};
+const MemoizedWinnersList = React.memo(WinnersList);
 
-const WinnerBanner = (props: Props) => {
+const WinnerBanner = () => {
   const [isLoading, setIsLoading] = React.useState(false);
+  const dispatch = useDispatch<AppDispatch>();
   const currentRaffle = useSelector(
     (state: RootState) => state.raffle.currentRaffle
   );
+  const axios = useAxiosPrivate();
 
-  const handleSpinDraw = () => {
+  const winners = useMemo(() => {
+    return currentRaffle?.participants?.filter((p) => p.isWinner) || [];
+  }, [currentRaffle?.participants]);
+
+  const handleSpinDraw = useCallback(() => {
     setIsLoading(true);
+    dispatch(spinRaffleThunk({ raffleId: currentRaffle?._id, axios }))
+      .then(() => {
+        setIsLoading(false);
+      })
+      .catch(() => {
+        setIsLoading(false);
+      });
+  }, [dispatch, currentRaffle?._id, axios]);
 
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 3000);
-  };
+  const component = useMemo(() => {
+    if (!currentRaffle) {
+      return null; // or a loading indicator
+    }
 
-  return (
-    <Box
-      sx={{
-        width: "100%",
-        height: "360px",
-        background: `url(${winnerBannerimg})`,
-        border: "1px solid #fff",
-        margin: "1rem 0",
-        borderRadius: "10px",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
+    if (winners.length > 0) {
+      return <MemoizedWinnersList winners={winners} />;
+    }
+
+    return (
       <Button
         type="submit"
         disabled={isLoading}
@@ -66,8 +74,26 @@ const WinnerBanner = (props: Props) => {
           </Typography>
         )}
       </Button>
+    );
+  }, [winners.length, isLoading, handleSpinDraw, currentRaffle]);
+
+  return (
+    <Box
+      sx={{
+        width: "100%",
+        height: "360px",
+        background: `url(${winnerBannerimg})`,
+        border: "1px solid #fff",
+        margin: "1rem 0",
+        borderRadius: "10px",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      {component}
     </Box>
   );
 };
 
-export default WinnerBanner;
+export default React.memo(WinnerBanner);

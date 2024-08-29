@@ -5,6 +5,7 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { PAGE_ROUTES } from "../../../config/constants";
 import { AppDispatch } from "../../../config/store";
 import { createRaffleThunk } from "../../../features/raffle/raffleThunk";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import { RaffleCreateParams } from "../../../types";
 import PageWrapper from "../../common/PageWrapper";
 
@@ -12,6 +13,7 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch<AppDispatch>();
+  const axios = useAxiosPrivate();
 
   const isCreateRafflePage = useMemo(
     () => location.pathname === "/" + PAGE_ROUTES.CREATE_RAFFLE,
@@ -28,7 +30,7 @@ const Dashboard: React.FC = () => {
 
   const handleCreateRaffle = async (raffleData: RaffleCreateParams) => {
     try {
-      await dispatch(createRaffleThunk(raffleData)).unwrap();
+      await dispatch(createRaffleThunk({ params: raffleData, axios })).unwrap();
       navigate(PAGE_ROUTES.HOME);
     } catch (error) {
       console.error("Failed to create raffle:", error);

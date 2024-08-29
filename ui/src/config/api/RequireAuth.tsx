@@ -1,15 +1,21 @@
+import React from "react";
+import { useSelector } from "react-redux";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import useAuth from "../../hooks/useAuth";
+import { RootState } from "../store";
 
-const RequireAuth = () => {
-  const { auth } = useAuth();
+const RequireAuth: React.FC = () => {
+  const auth = useSelector((state: RootState) => state.auth);
   const location = useLocation();
 
-  return auth?.accessToken ? (
-    <Outlet />
-  ) : (
-    <Navigate to="/login" state={{ from: location }} replace />
-  );
+  if (auth.status === "loading" || auth.status === "idle") {
+    return <div>Loading...</div>;
+  }
+
+  if (!auth.isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return <Outlet />;
 };
 
 export default RequireAuth;

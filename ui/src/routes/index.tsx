@@ -14,31 +14,29 @@ const OneRaffle = lazy(() => import("../pages/OneRaffle"));
 
 const AppRoutes = () => {
   return (
-    <Router>
-      <Suspense fallback={<div>Loading...</div>}>
-        <Routes>
-          <Route path="/signup" element={<SignUpPage />} />
-          <Route path="/login" element={<LoginPage />} />
+    <Suspense fallback={<div>Loading...</div>}>
+      <Routes>
+        <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/login" element={<LoginPage />} />
 
-          <Route element={<RequireAuth />}>
-            <Route path={PAGE_ROUTES.HOME} element={<DashboardPage />}>
-              <Route index element={<DrawsList />} />
-              <Route
-                path={PAGE_ROUTES.CREATE_RAFFLE}
-                element={<CreateRaffleForm />}
-              />
-            </Route>
-            <Route path={PAGE_ROUTES.ONE_DRAW} element={<OneRaffle />}>
-              <Route index element={<ParticipantsList />} />
-              <Route
-                path={PAGE_ROUTES.ADD_PARTICIPANT}
-                element={<AddParticipantForm />}
-              />
-            </Route>
+        <Route element={<RequireAuth />}>
+          <Route path={PAGE_ROUTES.HOME} element={<DashboardPage />}>
+            <Route index element={<DrawsList />} />
+            <Route
+              path={PAGE_ROUTES.CREATE_RAFFLE}
+              element={<CreateRaffleForm />}
+            />
           </Route>
-        </Routes>
-      </Suspense>
-    </Router>
+          <Route path={PAGE_ROUTES.ONE_DRAW} element={<OneRaffle />}>
+            <Route index element={<ParticipantsList />} />
+            <Route
+              path={PAGE_ROUTES.ADD_PARTICIPANT}
+              element={<AddParticipantForm />}
+            />
+          </Route>
+        </Route>
+      </Routes>
+    </Suspense>
   );
 };
 

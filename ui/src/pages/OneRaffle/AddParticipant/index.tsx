@@ -11,6 +11,7 @@ import { openAlertWithAutoClose } from "../../../features/alert/alertThunk";
 import { addParticipantToCurrentRaffle } from "../../../features/raffle/raffleSlice";
 import { addParticipantThunk } from "../../../features/raffle/raffleThunk";
 import { useAppDispatch } from "../../../hooks/useAppDispatch";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import { User } from "../../../types";
 import { initialValues, schema } from "./config";
 
@@ -18,6 +19,7 @@ const AddParticipantForm: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { _id } = useSelector((state: RootState) => state.raffle.currentRaffle);
+  const axios = useAxiosPrivate();
 
   const handleFormSubmit = async (
     values: User,
@@ -25,8 +27,7 @@ const AddParticipantForm: React.FC = () => {
   ) => {
     try {
       const payload = { participant: values, raffleId: _id };
-      console.log(payload);
-      await dispatch(addParticipantThunk(payload)).unwrap();
+      await dispatch(addParticipantThunk({ axios, ...payload })).unwrap();
       dispatch(addParticipantToCurrentRaffle(values));
       dispatch(openAlertWithAutoClose("Raffle created", "success", 8000));
       navigate(PAGE_ROUTES.ONE_DRAW.replace(":id", _id));

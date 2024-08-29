@@ -18,19 +18,21 @@ import { PAGE_ROUTES } from "../../../config/constants";
 import { openAlertWithAutoClose } from "../../../features/alert/alertThunk";
 import { createRaffleThunk } from "../../../features/raffle/raffleThunk";
 import { useAppDispatch } from "../../../hooks/useAppDispatch";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import { RaffleCreateParams } from "../../../types";
 import { initialValues, schema } from "./config";
 
 const CreateRaffleForm: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const axios = useAxiosPrivate();
 
   const handleFormSubmit = async (
     values: RaffleCreateParams,
     { resetForm, setSubmitting }: FormikHelpers<RaffleCreateParams>
   ) => {
     try {
-      await dispatch(createRaffleThunk(values)).unwrap();
+      await dispatch(createRaffleThunk({ params: values, axios })).unwrap();
       dispatch(openAlertWithAutoClose("Raffle created", "success", 8000));
       navigate(PAGE_ROUTES.HOME);
     } catch (err) {

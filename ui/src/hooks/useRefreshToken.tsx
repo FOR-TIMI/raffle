@@ -1,20 +1,23 @@
+import { useDispatch } from "react-redux";
 import axios from "../config/api";
 import { USER_API_ROUTES } from "../config/constants";
-import useAuth from "./useAuth";
+import { AppDispatch } from "../config/store";
+import { setUser } from "../features/auth/authSlice";
 
 const useRefreshToken = () => {
-  const { setAuth } = useAuth();
+  const dispatch = useDispatch<AppDispatch>();
 
   const refresh = async () => {
-    const response = await axios.get(USER_API_ROUTES.REFRESH_TOKEN, {
-      withCredentials: true,
-    });
-    setAuth((prev) => {
-      console.log(JSON.stringify(prev));
-      console.log(response.data.accessToken);
-      return { ...prev, accessToken: response.data.accessToken };
-    });
-    return response.data.accessToken;
+    try {
+      const response = await axios.post(USER_API_ROUTES.REFRESH_TOKEN, {
+        withCredentials: true,
+      });
+      dispatch(setUser(response.data.user));
+      return response.data.accessToken;
+    } catch (error) {
+      console.error("Failed to refresh token:", error);
+      return null;
+    }
   };
   return refresh;
 };

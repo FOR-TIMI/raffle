@@ -6,6 +6,8 @@ import {
   fetchRaffleDetails,
   getUserRafflesThunk,
   refreshRaffleDetails,
+  resetRaffleThunk,
+  spinRaffleThunk,
 } from "./raffleThunk";
 
 interface RaffleState {
@@ -38,14 +40,24 @@ const raffleSlice = createSlice({
       if (state.currentRaffle) {
         if (!state.currentRaffle.participants) {
           state.currentRaffle.participants = [];
+          state.currentRaffle.participantCount = 0;
+        } else {
+          const curr = state.currentRaffle;
+          const updatedCurrentRaffle = {
+            ...curr,
+            participants: [action.payload, ...curr.participants],
+            participantCount: (curr.participantCount += 1),
+          };
+          state.currentRaffle = updatedCurrentRaffle;
         }
-        const curr = state.currentRaffle;
-        const updatedCurrentRaffle = {
-          ...curr,
-          participants: [action.payload, ...curr.participants],
-          participantCount: (curr.participantCount += 1),
-        };
-        state.currentRaffle = updatedCurrentRaffle;
+
+        // Update raffles list
+        state.raffles = state.raffles.map((raffle) => {
+          if (raffle._id === state.currentRaffle?._id) {
+            return state.currentRaffle;
+          }
+          return raffle;
+        });
       }
     },
   },
@@ -69,7 +81,8 @@ const raffleSlice = createSlice({
         state.error = action.error.message || "An error occurred";
       })
       .addCase(createRaffleThunk.fulfilled, (state, action) => {
-        state.raffles.unshift(action.payload);
+        const payload = action.payload;
+        state.raffles.unshift({ ...payload.raffle });
       })
       .addCase(fetchRaffleDetails.fulfilled, (state, action) => {
         state.currentRaffle = action.payload;
@@ -78,7 +91,33 @@ const raffleSlice = createSlice({
         state.currentRaffle = action.payload;
       })
       .addCase(addParticipantThunk.fulfilled, (state, action) => {
+        state.status = "succeeded";
+      })
+      .addCase(spinRaffleThunk.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.raffles = state.raffles.map((raffle) => {
+          if (raffle._id === state.currentRaffle?._id) {
+            return state.currentRaffle;
+          }
+          return raffle;
+        });
+      })
+      .addCase(spinRaffleThunk.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(spinRaffleThunk.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message || "An error occurred";
+      })
+      .addCase(resetRaffleThunk.fulfilled, (state, action) => {
         state.currentRaffle = action.payload;
+      })
+      .addCase(resetRaffleThunk.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(resetRaffleThunk.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message || "An error occurred";
       });
   },
 });

@@ -1,5 +1,6 @@
 import { Box, Chip, Paper, Typography } from "@mui/material";
 import React from "react";
+import Champion from "../../assets/icon/Champion";
 import { User } from "../../types";
 
 type Props = {
@@ -26,19 +27,7 @@ const OneParticipant = ({ participant }: Props) => {
           {participant.email}
         </Typography>
       </Box>
-      <Box>
-        {participant.isWinner && (
-          <Chip
-            label="Selected"
-            color="primary"
-            sx={{
-              backgroundColor: "#ffd700",
-              color: "#fff",
-              fontWeight: "bold",
-            }}
-          />
-        )}
-      </Box>
+      <Box>{participant.isWinner && <Champion />}</Box>
     </Paper>
   );
 };
