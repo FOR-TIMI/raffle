@@ -39,6 +39,12 @@ export interface RaffleResponse extends ResponseState {
   updatedAt: string;
   __v: number;
   participants?: User[];
+  qrCode?: string;
+}
+
+export interface CreateRaffleResponse extends ResponseState {
+  raffle: RaffleResponse;
+  qrCode: string;
 }
 
 export interface RaffleCreateParams {

@@ -8,14 +8,12 @@ import TextField from "../../../components/common/TextField";
 import TiLink from "../../../components/common/TiLink";
 import { PAGE_ROUTES } from "../../../config/constants";
 import { AppDispatch } from "../../../config/store";
-import useAuth from "../../../hooks/useAuth";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import { openAlertWithAutoClose } from "../../alert/alertThunk";
-import { loginUser } from "../authSlice";
+import { loginUser } from "../authThunk";
 import { initialValues, validationSchema } from "./validation";
 
 const AuthForm: React.FC = () => {
-  const { setAuth } = useAuth();
-
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -24,6 +22,7 @@ const AuthForm: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const axios = useAxiosPrivate();
 
   return (
     <Formik
@@ -32,10 +31,7 @@ const AuthForm: React.FC = () => {
       onSubmit={async (values, { setSubmitting }) => {
         try {
           setSubmitting(true);
-          const { accessToken, refreshToken } = await dispatch(
-            loginUser(values)
-          ).unwrap();
-          setAuth({ refreshToken, accessToken });
+          await dispatch(loginUser({ ...values, axios })).unwrap();
           navigate(from, { replace: true });
         } catch (err) {
           dispatch(

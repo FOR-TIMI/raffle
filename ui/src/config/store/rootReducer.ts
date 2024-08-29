@@ -1,12 +1,12 @@
 import { combineReducers } from "@reduxjs/toolkit";
 import alertReducer from "../../features/alert/alertSlice";
-import authReducer from "../../features/auth/authSlice";
-import raffleReducer from "../../features/raffle/raffleSlice";
+import { authPersistedReducer } from "../../features/auth/authPersistor";
+import { rafflePersistedReducer } from "../../features/raffle/rafflePersistor";
 
 const rootReducer = combineReducers({
-  auth: authReducer,
+  auth: authPersistedReducer,
   alert: alertReducer,
-  raffle: raffleReducer,
+  raffle: rafflePersistedReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

@@ -4,6 +4,7 @@ import {
   logoutHandler,
   refreshTokenHandler,
 } from "../../controller/auth";
+import requireUser from "../../middleware/requireUser";
 import validateResource from "../../middleware/validate";
 import { createSessionSchema } from "../../schemas/auth";
 import { asyncHandler } from "../../utils/asyncHandler";

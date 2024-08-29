@@ -11,6 +11,7 @@ import {
 import { findUserByEmail, findUserById } from "../../service/user";
 import { verifyJwt } from "../../utils/jwt";
 import log from "../../utils/Logger";
+import parseDuration from "../../utils/parseDuration";
 
 export async function createSessionHandler(
   req: Request<{}, {}, CreateSessionRequest>,
@@ -33,16 +34,25 @@ export async function createSessionHandler(
     const isVaild = await user.verifyPassword(password);
 
     if (!isVaild) {
-      return res.status(200).json({ message });
+      return res.status(200).json({
+        message,
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+        },
+      });
     }
 
     const accessToken = signAccessToken(user);
     const refreshToken = await signRefreshToken({ userId: user.id });
 
     const accessTokenTtl =
-      (parseInt(config.get<string>("accessTokenTtl")) || 900) * 1000;
+      parseDuration(config.get<string>("accessTokenTtl")) || 15 * 60 * 1000; // default 15 minutes
     const refreshTokenTtl =
-      (parseInt(config.get<string>("refreshTokenTtl")) || 2592000) * 1000;
+      parseDuration(config.get<string>("refreshTokenTtl")) ||
+      7 * 24 * 60 * 60 * 1000; // default 7 days
 
     const domain = config.get<string>("cookieDomain");
 
@@ -67,6 +77,12 @@ export async function createSessionHandler(
     return res.status(200).json({
       accessToken,
       refreshToken,
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      },
     });
   } catch (e: any) {
     return res.status(500).json({ message: "Internal server error", error: e });
@@ -105,22 +121,37 @@ export async function refreshTokenHandler(req: Request, res: Response) {
   const accessToken = signAccessToken(user);
   const newRefreshToken = await signRefreshToken({ userId: user.id });
 
+  const accessTokenTtl =
+    parseDuration(config.get<string>("accessTokenTtl")) || 15 * 60 * 1000; // default 15 minutes
+
+  const refreshTokenTtl =
+    parseDuration(config.get<string>("refreshTokenTtl")) ||
+    7 * 24 * 60 * 60 * 1000; // default 7 days
+
   // Set new cookies
   res.cookie("accessToken", accessToken, {
-    maxAge: config.get<number>("accessTokenTtl") * 1000,
+    maxAge: accessTokenTtl,
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
   });
 
   res.cookie("refreshToken", newRefreshToken, {
-    maxAge: config.get<number>("refreshTokenTtl") * 1000,
+    maxAge: refreshTokenTtl,
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
   });
 
-  return res.send({ accessToken });
+  return res.send({
+    accessToken,
+    user: {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+    },
+  });
 }
 
 export async function logoutHandler(req: Request, res: Response) {

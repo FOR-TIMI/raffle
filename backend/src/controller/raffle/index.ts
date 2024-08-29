@@ -17,6 +17,7 @@ import {
   SpinRaffleParams,
 } from "../../schemas/raffle";
 
+import mongoose from "mongoose";
 import RaffleParticipantModel from "../../model/raffle/participant";
 import MailService from "../../service/mail";
 import { getOneRaffle } from "../../service/raffle";
@@ -36,20 +37,33 @@ export async function createRaffleHandler(
   }
 
   try {
+    const uiBaseUrl = config.get<string>("uiBaseUrl");
+
+    // Create a temporary ID for the QR code
+    const tempId = new mongoose.Types.ObjectId();
+
+    const qrCodeDataUrl = await QRCode.toDataURL(
+      `${uiBaseUrl}/raffle/${tempId}`
+    );
+
     const raffleData = {
       title: title.trim(),
       noOfPossibleWinners,
       creatorEmail: signedInUser.email,
+      qrCode: qrCodeDataUrl,
     };
 
     const raffle = await RaffleModel.create(raffleData);
 
-    const uiBaseUrl = config.get<string>("uiBaseUrl");
-    const qrCodeDataUrl = await QRCode.toDataURL(
+    // Update the QR code with the actual raffle ID
+    const updatedQrCodeDataUrl = await QRCode.toDataURL(
       `${uiBaseUrl}/raffle/${raffle._id}`
     );
 
-    return res.status(201).json({ raffle, qrCode: qrCodeDataUrl });
+    raffle.qrCode = updatedQrCodeDataUrl;
+    await raffle.save();
+
+    return res.status(201).json({ raffle });
   } catch (error: any) {
     console.error("Error creating raffle:", error);
     if (error.name === "ValidationError") {
@@ -78,14 +92,10 @@ export async function joinRaffleHandler(
       return res.status(404).json({ message: "Raffle not found" });
     }
 
-    console.log("payload", participantData);
-
     const existingParticipant = await RaffleParticipantModel.findOne({
       raffle: raffle._id,
       email: participantData.email,
     });
-
-    console.log("existingParticipant", existingParticipant);
 
     if (existingParticipant) {
       return res

@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { Outlet, useNavigate } from "react-router-dom";
 import { PAGE_ROUTES } from "../../../config/constants";
 import { RootState } from "../../../config/store";
-import { setAuthenticated } from "../../../features/auth/authSlice";
 import { checkAuthStatus } from "./protected.service";
 
 const ProtectedRoute = () => {
@@ -19,11 +18,6 @@ const ProtectedRoute = () => {
       if (!isAuthenticated) {
         try {
           const status = await checkAuthStatus();
-          if (status.isAuthenticated) {
-            dispatch(setAuthenticated(true));
-          } else {
-            navigate(PAGE_ROUTES.LOGIN, { replace: true });
-          }
         } catch (error) {
           console.error("Error verifying authentication:", error);
           navigate(PAGE_ROUTES.LOGIN, { replace: true });

@@ -18,6 +18,9 @@ export class Raffle {
 
   @prop({ default: 0 })
   winnerCount: number;
+
+  @prop({ required: true })
+  qrCode: string;
 }
 
 const RaffleModel = getModelForClass(Raffle);

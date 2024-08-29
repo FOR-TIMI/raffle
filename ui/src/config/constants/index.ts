@@ -19,6 +19,7 @@ export const USER_API_ROUTES = {
   VERIFY_EMAIL: "/users/verify/:id/:verificationCode",
   REFRESH_TOKEN: "/sessions/refresh",
   GET_USER: "/users/me",
+  LOG_OUT: "/sessions/end",
 };
 
 export const RAFFLES_API_ROUTES = {
