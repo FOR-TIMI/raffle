@@ -1,3 +1,4 @@
+import { Box } from "@mui/material";
 import { useEffect, useMemo } from "react";
 import { LuArrowLeft, LuPlus } from "react-icons/lu";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,9 +13,11 @@ const ParticipantsList = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const axios = useAxiosPrivate();
-  const { _id: raffleId, winnerCount } = useSelector(
-    (state: RootState) => state.raffle.currentRaffle
-  );
+  const {
+    _id: raffleId,
+    winnerCount,
+    participantCount,
+  } = useSelector((state: RootState) => state.raffle.currentRaffle);
 
   const isAddParticipantPage = location.pathname.includes("/add-participant");
 
@@ -62,6 +65,9 @@ const ParticipantsList = () => {
   return (
     <ParticipantsWrapper title={title} Button={Button}>
       <Outlet />
+      {!participantCount && !isAddParticipantPage && (
+        <Box>There are no participants for this raffle yet</Box>
+      )}
     </ParticipantsWrapper>
   );
 };

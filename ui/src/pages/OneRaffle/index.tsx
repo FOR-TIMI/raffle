@@ -65,10 +65,9 @@ const OneRaffle: React.FC = () => {
         <PageWrapper
           status={raffleDetails.winnerCount > 0 ? "Inactive" : "Active"}
           title={raffleDetails.title}
-          Button={CustomButton}
+          Button={!!raffleDetails.participantCount && CustomButton}
         >
-          <WinnerBanner />
-
+          {!!raffleDetails.participantCount && <WinnerBanner />}
           <ParticipantsList />
         </PageWrapper>
       </section>
