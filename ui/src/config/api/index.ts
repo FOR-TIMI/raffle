@@ -10,10 +10,13 @@ export const injectStore = (_store: {
   store = _store;
 };
 
-const BASE_URL = "http://localhost:8000/api";
+const BASE_URL = process.env.REACT_APP_BASE_URL || "http://localhost:8000/api";
 
 export default axios.create({
   baseURL: BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 export const axiosPrivate = axios.create({
