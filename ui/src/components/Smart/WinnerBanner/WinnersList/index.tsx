@@ -18,14 +18,14 @@ const WinnersList = ({ winners }: Props) => {
           textAlign="center"
           variant="h3"
         >
-          WINNERS{" "}
+          WINNER{winners.length !== 1 && "S"}
         </Typography>
         <Trophy size={70} />
       </Box>
 
       <Grid container spacing={2}>
         {winners.map((winner, i) => (
-          <Grid item xs={12} sm={6} md={4} key={i}>
+          <Grid item xs={12} sm={6} md={winners.length > 3 ? 4 : 8} key={i}>
             <OneWinner winner={winner} />
           </Grid>
         ))}
