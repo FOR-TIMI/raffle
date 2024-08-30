@@ -8,7 +8,6 @@ const allowedOrigins = [
 ];
 
 export default {
-  port: 8000,
   dbUri: "localhost:27017/",
   baseRoute: "/api",
   logLevel: "debug",
