@@ -51,3 +51,19 @@ export interface RaffleCreateParams {
   title: string;
   noOfPossibleWinners: number;
 }
+
+export interface SpinRaffleResponse {
+  raffle: {
+    _id: string;
+    title: string;
+    creatorEmail: string;
+    noOfPossibleWinners: number;
+    participantCount: number;
+    winnerCount: number;
+    qrCode: string;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
+  };
+  winners: User[];
+}

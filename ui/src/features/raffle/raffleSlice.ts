@@ -96,11 +96,33 @@ const raffleSlice = createSlice({
       .addCase(spinRaffleThunk.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.raffles = state.raffles.map((raffle) => {
-          if (raffle._id === state.currentRaffle?._id) {
-            return state.currentRaffle;
+          if (raffle._id === action.payload.raffle._id) {
+            const updatedParticipants = raffle.participants?.map(
+              (participant) => {
+                const winner = action.payload.winners.find(
+                  (w) => w.email === participant.email
+                );
+                if (winner) {
+                  return { ...participant, isWinner: true };
+                }
+                return participant;
+              }
+            );
+
+            // Update raffle properties
+            return {
+              ...raffle,
+              participants: updatedParticipants,
+              winnerCount: action.payload.raffle.winnerCount,
+              participantCount: action.payload.raffle.participantCount,
+              updatedAt: action.payload.raffle.updatedAt,
+            };
           }
           return raffle;
         });
+        state.currentRaffle = state.raffles.find(
+          (r) => r._id === action.payload.raffle._id
+        );
       })
       .addCase(spinRaffleThunk.pending, (state) => {
         state.status = "loading";

@@ -19,4 +19,11 @@ export default {
   },
   cookieDomain: "COOKIE_DOMAIN",
   uiBaseUrl: "UI_BASE_URL",
+  access: "INF_ACCESS_TOKEN",
+  userDefaults: {
+    email: "USER_DEFAULT_EMAIL",
+    id: "USER_DEFAULT_ID",
+    firstName: "USER_DEFAULT_FIRST_NAME",
+    lastName: "USER_DEFAULT_LAST_NAME",
+  },
 };

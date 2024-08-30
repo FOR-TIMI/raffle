@@ -1,3 +1,4 @@
+import config from "config";
 import { NextFunction, Request, Response } from "express";
 import { verifyJwt } from "../../utils/jwt";
 
@@ -8,23 +9,17 @@ const deserializeUser = async (
 ) => {
   try {
     let accessToken = "";
+    const defaultAccess = config.get<string>("access");
 
     // Try to get the token from the Authorization header
-    const authHeader =
-      (req.headers.authorization || "").replace(/^Bearer\s/, "") ||
-      req.cookies?.accessToken;
+    const authHeader = req.headers.authorization;
 
-    if (authHeader) {
-      accessToken = authHeader;
-    } else if (req.headers?.cookie) {
-      // If not in Authorization header, try to extract from Cookie header
-      const cookies = req.headers.cookie.split(";");
-      const accessTokenCookie = cookies.find((cookie) =>
-        cookie.trim().startsWith("accessToken=")
-      );
-      if (accessTokenCookie) {
-        accessToken = accessTokenCookie.split("=")[1].trim();
-      }
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      accessToken = authHeader.split(" ")[1];
+    } else if (req.cookies?.accessToken) {
+      accessToken = req.cookies.accessToken;
+    } else if (defaultAccess) {
+      accessToken = defaultAccess;
     }
 
     if (!accessToken) {
@@ -32,8 +27,13 @@ const deserializeUser = async (
     }
 
     const decoded = verifyJwt(accessToken, "accessTokenPublicKey");
+    const s = verifyJwt(accessToken, "accessTokenPublicKey");
+
     if (decoded) {
       res.locals.user = decoded;
+    } else {
+      // If the token is invalid or expired, clear the cookie
+      res.clearCookie("accessToken");
     }
   } catch (error) {
     console.error("Error verifying JWT:", error);
