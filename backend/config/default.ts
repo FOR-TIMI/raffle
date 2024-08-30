@@ -1,10 +1,10 @@
 import helmet from "helmet";
-
 const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:8080",
   "https://raffle-zeta-eight.vercel.app",
   "https://raffle-mu.vercel.app",
+  "https://raffle-80la.onrender.com",
 ];
 
 export default {
@@ -35,9 +35,18 @@ export default {
     },
   },
   corsConfig: {
-    origin: allowedOrigins,
-    optionsSuccessStatus: 200,
+    origin: function (
+      origin: string | undefined,
+      callback: (error: Error | null, allow?: boolean) => void
+    ) {
+      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
+    optionsSuccessStatus: 200,
   },
   rateLimitConfig: {
     windowMs: 15 * 60 * 1000,
