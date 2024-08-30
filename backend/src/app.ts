@@ -39,11 +39,6 @@ app.use(limiter);
 
 // CORS configuration
 const corsOptions = config.get<object>("corsConfig");
-
-// Enable pre-flight requests for all routes
-app.options("*", cors(corsOptions));
-
-// Apply CORS middleware to all routes
 app.use(cors(corsOptions));
 
 // Custom middleware

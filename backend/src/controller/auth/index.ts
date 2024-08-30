@@ -1,6 +1,5 @@
 import config from "config";
 import { Request, Response } from "express";
-import { get } from "lodash";
 import SessionModel from "../../model/session";
 import { CreateSessionRequest } from "../../schemas/auth";
 import {
@@ -21,70 +20,67 @@ export async function createSessionHandler(
     const message = "Invalid email or password";
     const { email, password } = req.body;
 
-    const user = await findUserByEmail(email);
+    // const user = await findUserByEmail(email);
 
-    if (!user) {
-      return res.status(200).json({ message: message });
-    }
+    // if (!user) {
+    //   return res.status(200).json({ message: message });
+    // }
 
-    if (!user.verifiedEmail) {
-      return res.status(400).json({ message: "Please verify your email" });
-    }
+    // if (!user.verifiedEmail) {
+    //   return res.status(400).json({ message: "Please verify your email" });
+    // }
 
-    const isVaild = await user.verifyPassword(password);
+    // const isVaild = await user.verifyPassword(password);
 
-    if (!isVaild) {
-      return res.status(200).json({
-        message,
-        user: {
-          id: user.id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-        },
-      });
-    }
+    // log.info(`User ${user.id} logged in is valid ${isVaild}`);
 
-    const accessToken = signAccessToken(user);
-    const refreshToken = await signRefreshToken({ userId: user.id });
+    // if (!isVaild) {
+    //   return res.status(200).json({
+    //     message,
+    //   });
+    // }
 
-    const accessTokenTtl =
-      parseDuration(config.get<string>("accessTokenTtl")) || 15 * 60 * 1000; // default 15 minutes
-    const refreshTokenTtl =
-      parseDuration(config.get<string>("refreshTokenTtl")) ||
-      7 * 24 * 60 * 60 * 1000; // default 7 days
+    // const accessToken = signAccessToken(user);
+    // const refreshToken = await signRefreshToken({ userId: user.id });
 
-    const domain = config.get<string>("cookieDomain");
+    // const accessTokenTtl =
+    //   parseDuration(config.get<string>("accessTokenTtl")) || 15 * 60 * 1000; // default 15 minutes
+    // const refreshTokenTtl =
+    //   parseDuration(config.get<string>("refreshTokenTtl")) ||
+    //   7 * 24 * 60 * 60 * 1000; // default 7 days
 
-    console.log("Cookie domain--->", domain);
+    // const domain = config.get<string>("cookieDomain");
 
-    res.cookie("accessToken", accessToken, {
-      maxAge: accessTokenTtl,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
-      domain,
-    });
+    // res.cookie("accessToken", accessToken, {
+    //   maxAge: accessTokenTtl,
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === "production",
+    //   sameSite: "strict",
+    //   domain,
+    // });
 
-    res.cookie("refreshToken", refreshToken, {
-      maxAge: refreshTokenTtl,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
-      domain,
-    });
+    // res.cookie("refreshToken", refreshToken, {
+    //   maxAge: refreshTokenTtl,
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === "production",
+    //   sameSite: "strict",
+    //   domain,
+    // });
 
-    log.info(`User ${user.id} logged in`);
+    // log.info(`User ${user.id} logged in`);
+
+    // console.log({ accessToken });
+    const defaultUser = config.get<{
+      id: string;
+      email: string;
+      firstName: string;
+      lastName: string;
+    }>("defaultUser");
 
     return res.status(200).json({
-      accessToken,
-      refreshToken,
-      user: {
-        id: user.id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-      },
+      accessToken: "accessToken",
+      refreshToken: "refreshToken",
+      user: defaultUser,
     });
   } catch (e: any) {
     return res.status(500).json({ message: "Internal server error", error: e });
@@ -117,7 +113,7 @@ export async function refreshTokenHandler(req: Request, res: Response) {
   const user = await findUserById(String(session.user));
 
   if (!user) {
-    return res.status(401).send(errorMessage);
+    return res.status(401).send({ errorMessage });
   }
 
   const accessToken = signAccessToken(user);
@@ -145,7 +141,7 @@ export async function refreshTokenHandler(req: Request, res: Response) {
     sameSite: "strict",
   });
 
-  return res.send({
+  return res.status(200).json({
     accessToken,
     user: {
       id: user.id,

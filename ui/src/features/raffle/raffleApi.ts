@@ -4,6 +4,7 @@ import {
   CreateRaffleResponse,
   RaffleCreateParams,
   RaffleResponse,
+  SpinRaffleResponse,
   User,
 } from "../../types";
 
@@ -58,7 +59,7 @@ export const addParticipant = async (
 export const spinRaffle = async (
   raffleId: string,
   axiosInstance: AxiosInstance
-): Promise<RaffleResponse> => {
+): Promise<SpinRaffleResponse> => {
   const response = await axiosInstance.get(
     RAFFLES_API_ROUTES.SPIN_RAFFLE.replace(":raffleId", raffleId),
     {

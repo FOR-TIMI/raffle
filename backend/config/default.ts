@@ -1,13 +1,14 @@
 import helmet from "helmet";
 const allowedOrigins = [
   "http://localhost:3000",
-  "http://localhost:8080",
+  "http://localhost:3000",
   "https://raffle-zeta-eight.vercel.app",
   "https://raffle-mu.vercel.app",
   "https://raffle-80la.onrender.com",
 ];
 
 export default {
+  port: 8000,
   dbUri: "localhost:27017/",
   baseRoute: "/api",
   logLevel: "debug",

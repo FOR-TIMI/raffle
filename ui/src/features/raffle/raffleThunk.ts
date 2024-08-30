@@ -5,6 +5,7 @@ import {
   CreateRaffleResponse,
   RaffleCreateParams,
   RaffleResponse,
+  SpinRaffleResponse,
   User,
 } from "../../types";
 import {
@@ -98,7 +99,7 @@ export const refreshRaffleDetails = createAsyncThunk<
 });
 
 export const spinRaffleThunk = createAsyncThunk<
-  RaffleResponse,
+  SpinRaffleResponse,
   { raffleId: string; axios: AxiosInstance }
 >("raffles/spinRaffle", async ({ raffleId, axios }, { rejectWithValue }) => {
   try {
