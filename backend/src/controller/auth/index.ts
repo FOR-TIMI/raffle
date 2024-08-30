@@ -62,7 +62,7 @@ export async function createSessionHandler(
       maxAge: accessTokenTtl,
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "none",
       domain,
     });
 
@@ -70,7 +70,7 @@ export async function createSessionHandler(
       maxAge: refreshTokenTtl,
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: "none",
       domain,
     });
 
