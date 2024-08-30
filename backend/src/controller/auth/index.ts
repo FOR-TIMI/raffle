@@ -56,6 +56,8 @@ export async function createSessionHandler(
 
     const domain = config.get<string>("cookieDomain");
 
+    console.log("Cookie domain--->", domain);
+
     res.cookie("accessToken", accessToken, {
       maxAge: accessTokenTtl,
       httpOnly: true,
