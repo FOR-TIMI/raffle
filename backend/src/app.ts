@@ -43,6 +43,11 @@ const corsOptions = config.get<object>("corsConfig");
 // Enable pre-flight requests for all routes
 app.options("*", cors(corsOptions));
 
+app.options("*", (req, res) => {
+  console.log("Handling OPTIONS request");
+  res.sendStatus(200);
+});
+
 // Apply CORS middleware to all routes
 app.use(cors(corsOptions));
 

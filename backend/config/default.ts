@@ -1,13 +1,8 @@
 import helmet from "helmet";
-const allowedOrigins = [
-  "http://localhost:3000",
-  "http://localhost:8080",
-  "https://raffle-zeta-eight.vercel.app",
-  "https://raffle-mu.vercel.app",
-  "https://raffle-80la.onrender.com",
-];
+const allowedOrigins = ["https://raffle-zeta-eight.vercel.app"];
 
 export default {
+  port: 8000,
   dbUri: "localhost:27017/",
   baseRoute: "/api",
   logLevel: "debug",
@@ -15,7 +10,7 @@ export default {
   refreshTokenTtl: "7d",
   accessTokenPrivateKey: "",
   refreshTokenPrivateKey: "",
-  uiBaseUrl: "http://localhost:3000",
+  uiBaseUrl: "https://raffle-zeta-eight.vercel.app",
   smtp: {
     user: "hftwu44la5m4ux7g@ethereal.email",
     pass: "xbXyhfPwyd3RXGdwN3",
