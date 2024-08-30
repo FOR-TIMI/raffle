@@ -2,7 +2,7 @@ import { Box, Button, CircularProgress, Grid, Typography } from "@mui/material";
 import { Formik, FormikHelpers } from "formik";
 import React from "react";
 import { useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import TransitionAlerts from "../../../components/common/Alert";
 import TextField from "../../../components/common/TextField";
 import { PAGE_ROUTES } from "../../../config/constants";
@@ -29,12 +29,15 @@ const AddParticipantForm: React.FC = () => {
       const payload = { participant: values, raffleId: _id };
       await dispatch(addParticipantThunk({ axios, ...payload })).unwrap();
       dispatch(addParticipantToCurrentRaffle(values));
-      dispatch(openAlertWithAutoClose("Raffle created", "success", 8000));
-      navigate(PAGE_ROUTES.ONE_DRAW.replace(":id", _id));
+      dispatch(openAlertWithAutoClose("Participant Added", "success", 1000));
+
+      setTimeout(() => {
+        navigate(PAGE_ROUTES.ONE_DRAW.replace(":id", _id));
+      }, 1000);
     } catch (err) {
       dispatch(
         openAlertWithAutoClose(
-          err.message || "An error occurred while creating the raffle",
+          err.message || "Couldn't add participant",
           "error",
           3000
         )

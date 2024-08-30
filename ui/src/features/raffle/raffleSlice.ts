@@ -3,6 +3,7 @@ import { RaffleResponse, User } from "../../types";
 import {
   addParticipantThunk,
   createRaffleThunk,
+  deleteRaffleThunk,
   fetchRaffleDetails,
   getUserRafflesThunk,
   refreshRaffleDetails,
@@ -16,6 +17,9 @@ interface RaffleState {
   error: string | null;
   lastFetchTime: number | null;
   currentRaffle: RaffleResponse | null;
+  isRefreshing: boolean;
+  isDeleting: boolean;
+  isResetting: boolean;
 }
 
 const initialState: RaffleState = {
@@ -24,6 +28,9 @@ const initialState: RaffleState = {
   error: null,
   lastFetchTime: null,
   currentRaffle: null,
+  isRefreshing: false,
+  isDeleting: false,
+  isResetting: false,
 };
 
 const raffleSlice = createSlice({
@@ -87,9 +94,6 @@ const raffleSlice = createSlice({
       .addCase(fetchRaffleDetails.fulfilled, (state, action) => {
         state.currentRaffle = action.payload;
       })
-      .addCase(refreshRaffleDetails.fulfilled, (state, action) => {
-        state.currentRaffle = action.payload;
-      })
       .addCase(addParticipantThunk.fulfilled, (state, action) => {
         state.status = "succeeded";
       })
@@ -131,15 +135,70 @@ const raffleSlice = createSlice({
         state.status = "failed";
         state.error = action.error.message || "An error occurred";
       })
-      .addCase(resetRaffleThunk.fulfilled, (state, action) => {
-        state.currentRaffle = action.payload;
-      })
-      .addCase(resetRaffleThunk.pending, (state) => {
-        state.status = "loading";
-      })
+
       .addCase(resetRaffleThunk.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message || "An error occurred";
+        state.isResetting = false;
+      })
+      .addCase(refreshRaffleDetails.pending, (state) => {
+        state.isRefreshing = true;
+      })
+      .addCase(refreshRaffleDetails.fulfilled, (state, action) => {
+        state.currentRaffle = action.payload;
+        state.isRefreshing = false;
+      })
+      .addCase(refreshRaffleDetails.rejected, (state) => {
+        state.isRefreshing = false;
+      })
+      .addCase(deleteRaffleThunk.pending, (state) => {
+        state.isDeleting = true;
+      })
+      .addCase(deleteRaffleThunk.fulfilled, (state, action) => {
+        state.raffles = state.raffles.filter(
+          (raffle) => raffle._id !== state.currentRaffle?._id
+        );
+        state.currentRaffle = null;
+        state.isDeleting = false;
+      })
+      .addCase(deleteRaffleThunk.rejected, (state) => {
+        state.isDeleting = false;
+      })
+
+      .addCase(resetRaffleThunk.pending, (state) => {
+        state.isResetting = true;
+      })
+      .addCase(resetRaffleThunk.fulfilled, (state, action) => {
+        // Reset the current raffle
+        if (state.currentRaffle) {
+          state.currentRaffle = {
+            ...state.currentRaffle,
+            winnerCount: 0,
+            participants: state.currentRaffle.participants?.map(
+              (participant) => ({
+                ...participant,
+                isWinner: false,
+              })
+            ),
+          };
+        }
+
+        // Reset the raffle in the raffles array
+        state.raffles = state.raffles.map((raffle) => {
+          if (raffle._id === action.payload._id) {
+            return {
+              ...raffle,
+              winnerCount: 0,
+              participants: raffle.participants?.map((participant) => ({
+                ...participant,
+                isWinner: false,
+              })),
+            };
+          }
+          return raffle;
+        });
+
+        state.isResetting = false;
       });
   },
 });

@@ -1,54 +1,135 @@
-import { Button, Typography } from "@mui/material";
-import React, { useEffect, useMemo, useState } from "react";
+import { Box, Button, Grid, Typography } from "@mui/material";
+import React, { useCallback, useEffect, useMemo } from "react";
+import { FiRefreshCw } from "react-icons/fi";
 import { LuLayoutDashboard } from "react-icons/lu";
+import { RiDeleteBinLine } from "react-icons/ri";
+import { RxReset } from "react-icons/rx";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+
 import PageWrapper from "../../components/common/PageWrapper";
 import Sidebar from "../../components/Smart/SideBar/SideBar";
 import SidebarItem from "../../components/Smart/SideBar/SideBarItem";
 import WinnerBanner from "../../components/Smart/WinnerBanner";
+import ParticipantsList from "./ParticipantPage";
+
+import { PAGE_ROUTES } from "../../config/constants";
 import { AppDispatch, RootState } from "../../config/store";
 import {
+  deleteRaffleThunk,
   fetchRaffleDetails,
   refreshRaffleDetails,
+  resetRaffleThunk,
 } from "../../features/raffle/raffleThunk";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import ParticipantsList from "./ParticipantPage";
 
 const OneRaffle: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const dispatch = useDispatch<AppDispatch>();
-  const raffleDetails = useSelector(
-    (state: RootState) => state.raffle.currentRaffle
-  );
-  const [isLoading, setIsLoading] = useState(false);
+  const {
+    currentRaffle: raffleDetails,
+    isRefreshing,
+    isDeleting,
+    isResetting,
+  } = useSelector((state: RootState) => state.raffle);
   const axios = useAxiosPrivate();
+  const navigte = useNavigate();
 
   useEffect(() => {
     if (id) {
       dispatch(fetchRaffleDetails({ id, axios }));
     }
-  }, [id, dispatch]);
+  }, [id, dispatch, axios]);
 
-  const handleRefresh = () => {
-    setIsLoading(true);
-    dispatch(refreshRaffleDetails({ id, axios })).then(() => {
-      setIsLoading(false);
-    });
-  };
+  const handleRefresh = useCallback(() => {
+    if (id) {
+      dispatch(refreshRaffleDetails({ id, axios }));
+    }
+  }, [id, dispatch, axios]);
 
-  const CustomButton = useMemo(
-    () => (
+  const handleDelete = useCallback(() => {
+    if (id) {
+      dispatch(deleteRaffleThunk({ raffleId: id, axios }));
+      setTimeout(() => {
+        navigte(PAGE_ROUTES.HOME, { replace: true });
+      }, 0);
+    }
+  }, [id, dispatch, axios]);
+
+  const handleReset = useCallback(() => {
+    if (id) {
+      dispatch(resetRaffleThunk({ raffleId: id, axios }));
+    }
+  }, [id, dispatch, axios]);
+
+  const CustomButton = useCallback(
+    ({ icon: Icon, text, onClick, isLoading }) => (
       <Button
+        startIcon={<Icon />}
+        onClick={onClick}
         variant="contained"
-        onClick={handleRefresh}
         disabled={isLoading}
         className="mb-4"
+        sx={{
+          backgroundColor: "#fff",
+          color: "black",
+          boxShadow: "none",
+          "&:hover": {
+            backgroundColor: "#fff",
+            color: "black",
+          },
+        }}
       >
-        {isLoading ? "Refreshing..." : "Refresh"}
+        {isLoading ? `${text}ing...` : text}
       </Button>
     ),
-    [isLoading]
+    []
+  );
+
+  const ButtonGroup = useMemo(
+    () => (
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="space-between"
+        maxWidth="500px"
+        padding="0 0 0 10px"
+      >
+        <Box ml="10px">
+          <CustomButton
+            icon={RxReset}
+            text="Reset"
+            onClick={handleReset}
+            isLoading={isResetting}
+          />
+        </Box>
+        <Box ml="10px">
+          <CustomButton
+            icon={FiRefreshCw}
+            text="Refresh"
+            onClick={handleRefresh}
+            isLoading={isRefreshing}
+          />
+        </Box>
+        <Box ml="10px">
+          <CustomButton
+            icon={RiDeleteBinLine}
+            text="Delete"
+            onClick={handleDelete}
+            isLoading={isDeleting}
+          />
+        </Box>
+      </Box>
+    ),
+    [
+      CustomButton,
+      handleReset,
+      handleRefresh,
+      handleDelete,
+      isResetting,
+      isRefreshing,
+      isDeleting,
+    ]
   );
 
   if (!raffleDetails) {
@@ -65,7 +146,7 @@ const OneRaffle: React.FC = () => {
         <PageWrapper
           status={raffleDetails.winnerCount > 0 ? "Inactive" : "Active"}
           title={raffleDetails.title}
-          Button={CustomButton}
+          Component={ButtonGroup}
         >
           {!!raffleDetails.participantCount && <WinnerBanner />}
           <ParticipantsList />
@@ -75,4 +156,4 @@ const OneRaffle: React.FC = () => {
   );
 };
 
-export default OneRaffle;
+export default React.memo(OneRaffle);

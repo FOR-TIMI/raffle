@@ -1,5 +1,5 @@
-import { Box } from "@mui/material";
-import { useEffect, useMemo } from "react";
+import { Box, CircularProgress } from "@mui/material";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { LuArrowLeft, LuPlus } from "react-icons/lu";
 import { useDispatch, useSelector } from "react-redux";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
@@ -13,6 +13,9 @@ const ParticipantsList = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const axios = useAxiosPrivate();
+
+  const [isLoading, setIsLoading] = useState(true);
+
   const {
     _id: raffleId,
     winnerCount,
@@ -25,13 +28,13 @@ const ParticipantsList = () => {
     return isAddParticipantPage ? "Add Participant" : "Participants";
   }, [isAddParticipantPage]);
 
-  const handleButtonClick = () => {
+  const handleButtonClick = useCallback(() => {
     if (isAddParticipantPage) {
       navigate(`/draws/${raffleId}`);
     } else {
       navigate(`/draws/${raffleId}/add-participant`);
     }
-  };
+  }, [isAddParticipantPage, raffleId, navigate]);
 
   const Button = useMemo(
     () =>
@@ -58,9 +61,16 @@ const ParticipantsList = () => {
 
   useEffect(() => {
     if (raffleId) {
-      dispatch(fetchRaffleDetails({ id: raffleId, axios }));
+      setIsLoading(true);
+      dispatch(fetchRaffleDetails({ id: raffleId, axios })).then(() =>
+        setIsLoading(false)
+      );
     }
   }, [dispatch, raffleId]);
+
+  if (isLoading) {
+    return <CircularProgress />;
+  }
 
   return (
     <ParticipantsWrapper title={title} Button={Button}>

@@ -81,3 +81,16 @@ export const resetRaffle = async (
   );
   return response.data;
 };
+
+export const deleteRaffle = async (
+  raffleId: string,
+  axiosInstance: AxiosInstance
+): Promise<RaffleResponse> => {
+  const response = await axiosInstance.delete(
+    RAFFLES_API_ROUTES.DELETE_RAFFLE.replace(":raffleId", raffleId),
+    {
+      withCredentials: true,
+    }
+  );
+  return response.data;
+};

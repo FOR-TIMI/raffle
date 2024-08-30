@@ -11,6 +11,7 @@ import {
 import {
   addParticipant,
   createRaffle,
+  deleteRaffle,
   getRaffle,
   getUserRaffles,
   resetRaffle,
@@ -116,6 +117,18 @@ export const resetRaffleThunk = createAsyncThunk<
 >("raffles/resetRaffle", async ({ raffleId, axios }, { rejectWithValue }) => {
   try {
     const data = await resetRaffle(raffleId, axios);
+    return data;
+  } catch (error) {
+    return rejectWithValue((error as any).response?.data);
+  }
+});
+
+export const deleteRaffleThunk = createAsyncThunk<
+  RaffleResponse,
+  { raffleId: string; axios: AxiosInstance }
+>("raffles/deleteRaffle", async ({ raffleId, axios }, { rejectWithValue }) => {
+  try {
+    const data = await deleteRaffle(raffleId, axios);
     return data;
   } catch (error) {
     return rejectWithValue((error as any).response?.data);

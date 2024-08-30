@@ -4,11 +4,11 @@ import React from "react";
 type Props = {
   title: string;
   children: React.ReactNode;
-  Button: React.ReactNode;
+  Component: React.ReactNode;
   status?: "Active" | "Inactive";
 };
 
-const PageWrapper = ({ children, title, Button, status }: Props) => {
+const PageWrapper = ({ children, title, Component, status }: Props) => {
   const isActive = status === "Active";
   return (
     <div className="w-full h-screen my-10">
@@ -33,7 +33,7 @@ const PageWrapper = ({ children, title, Button, status }: Props) => {
             )}
           </Typography>
 
-          {Button}
+          {Component}
         </div>
         {children}
       </div>

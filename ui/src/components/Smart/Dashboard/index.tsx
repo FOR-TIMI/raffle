@@ -60,7 +60,7 @@ const Dashboard: React.FC = () => {
   );
 
   return (
-    <PageWrapper title="Dashboard" Button={Button}>
+    <PageWrapper title="Dashboard" Component={Button}>
       <div className="mt-5">
         <Outlet context={{ handleCreateRaffle }} />
       </div>

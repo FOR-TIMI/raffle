@@ -1,5 +1,4 @@
-import { Box, Chip, Paper, Typography } from "@mui/material";
-import React from "react";
+import { Box, Paper, Typography } from "@mui/material";
 import Champion from "../../assets/icon/Champion";
 import { User } from "../../types";
 
