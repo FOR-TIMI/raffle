@@ -1,33 +1,49 @@
-import {
-  Alert,
-  Box,
-  Button,
-  CircularProgress,
-  Typography,
-} from "@mui/material";
+import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import { Formik } from "formik";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
 import TransitionAlerts from "../../../components/common/Alert";
 import TextField from "../../../components/common/TextField";
 import TiLink from "../../../components/common/TiLink";
 import { PAGE_ROUTES } from "../../../config/constants";
 import { AppDispatch } from "../../../config/store";
-import { loginUser } from "../authSlice";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
+import { openAlertWithAutoClose } from "../../alert/alertThunk";
+import { loginUser } from "../authThunk";
 import { initialValues, validationSchema } from "./validation";
 
 const AuthForm: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const from = location.state?.from?.pathname || "/";
   const dispatch = useDispatch<AppDispatch>();
   const [showPassword, setShowPassword] = useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const axios = useAxiosPrivate();
 
   return (
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
-      onSubmit={(values) => {
-        dispatch(loginUser(values));
+      onSubmit={async (values, { setSubmitting }) => {
+        try {
+          setSubmitting(true);
+          await dispatch(loginUser({ ...values, axios })).unwrap();
+          navigate(from, { replace: true });
+        } catch (err) {
+          dispatch(
+            openAlertWithAutoClose(
+              err.message || "Something Went wrong",
+              "error",
+              8000
+            )
+          );
+        } finally {
+          setSubmitting(false);
+        }
       }}
     >
       {({
@@ -105,7 +121,7 @@ const AuthForm: React.FC = () => {
               {isSubmitting ? (
                 <CircularProgress
                   sx={{
-                    color: "#0D453C",
+                    color: "#fff",
                   }}
                   size={22}
                 />

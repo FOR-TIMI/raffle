@@ -18,6 +18,7 @@ import {
   resetPasswordSchema,
   verifyUserSchema,
 } from "../../schemas/user";
+import { asyncHandler } from "../../utils/asyncHandler";
 
 const router = express.Router();
 const baseUserRoute = "/users";
@@ -30,33 +31,37 @@ router.post(
   baseUserRoute,
   emailExistsMiddleware,
   validateResource(createUserSchema),
-  createUserHandler
+  asyncHandler(createUserHandler)
 );
 
 router.post(
   buildUserRoute("checkemail"),
   validateResource(checkEmailSchema),
-  emailExistsHandler
+  asyncHandler(emailExistsHandler)
 );
 
 router.get(
   buildUserRoute("verify/:id/:verificationCode"),
   validateResource(verifyUserSchema),
-  verifyUserHandler
+  asyncHandler(verifyUserHandler)
 );
 
 router.post(
   buildUserRoute("forgotpassword"),
   validateResource(forgotPasswordSchema),
-  forgotPasswordHandler
+  asyncHandler(forgotPasswordHandler)
 );
 
 router.post(
   buildUserRoute("resetpassword/:id/:passwordResetCode"),
   validateResource(resetPasswordSchema),
-  resetPasswordHandler
+  asyncHandler(resetPasswordHandler)
 );
 
-router.get(buildUserRoute("me"), requireUser, getSignedInUserHandler);
+router.get(
+  buildUserRoute("me"),
+  requireUser,
+  asyncHandler(getSignedInUserHandler)
+);
 
 export default router;

@@ -3,17 +3,18 @@ import Box from "@mui/material/Box";
 import Collapse from "@mui/material/Collapse";
 import IconButton from "@mui/material/IconButton";
 import { GrClose } from "react-icons/gr";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../config/store";
 import { closeAlert } from "../../features/alert/alertSlice";
 
 export default function TransitionAlerts() {
+  const dispatch = useDispatch();
   const { isOpen, message, alertType } = useSelector(
     (state: RootState) => state.alert
   );
 
   const handleClose = () => {
-    closeAlert();
+    dispatch(closeAlert());
   };
 
   return (

@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import { debounce } from "lodash";
 import * as yup from "yup";
 import axios from "../../../config/api";
@@ -37,6 +38,9 @@ const schema = yup.object().shape({
     .email("Invalid email format")
     .required("Email is required")
     .test("checkEmail", "Email is already in use", async function (value = "") {
+      if (!yup.string().email().isValidSync(value)) {
+        return true;
+      }
       return await checkEmailAvailability(value);
     }),
   password: yup
@@ -57,26 +61,36 @@ const signUpApi = async (body: RequestBody): Promise<any> => {
   return response.data;
 };
 
-const checkEmailAvailability = debounce(
-  async (email: string): Promise<boolean> => {
-    if (availabilityCache[email] !== undefined) {
-      return !availabilityCache[email];
-    }
-
-    try {
-      await axios.post(USER_API_ROUTES.CHECK_EMAIL_AVAILABILITY, { email });
-      availabilityCache[email] = true;
-      return false;
-    } catch (error) {
-      if (error.response?.status === 404) {
-        availabilityCache[email] = false;
-        return true;
+const checkEmailAvailability = async (email: string): Promise<boolean> => {
+  return new Promise((resolve) => {
+    const debouncedCheck = debounce(async () => {
+      if (availabilityCache[email] !== undefined) {
+        resolve(availabilityCache[email]);
+        return;
       }
-      console.error("Error checking email availability:", error);
-      return false;
-    }
-  },
-  550
-);
+
+      try {
+        await axios.post(USER_API_ROUTES.CHECK_EMAIL_AVAILABILITY, { email });
+        availabilityCache[email] = false; // Email is not available
+        resolve(false);
+      } catch (error) {
+        if ((error as AxiosError).response?.status === 404) {
+          availabilityCache[email] = true; // Email is available
+          resolve(true);
+        } else {
+          console.error("Error checking email availability:", error);
+          resolve(false);
+        }
+      }
+
+      // Clear cache after some time to prevent memory leaks
+      setTimeout(() => {
+        delete availabilityCache[email];
+      }, 5 * 60 * 1000); // Clear after 5 minutes
+    }, 550);
+
+    debouncedCheck();
+  });
+};
 
 export { initialValues, schema, signUpApi };

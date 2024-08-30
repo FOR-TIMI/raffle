@@ -162,6 +162,7 @@ const SignUpForm: React.FC = () => {
                   color: "#D0EAC3",
                   "&:hover": { color: "#fff" },
                   textTransform: "none",
+                  opacity: !isValid || !dirty || isSubmitting ? 0.7 : 1,
                 }}
               >
                 {isSubmitting ? (
