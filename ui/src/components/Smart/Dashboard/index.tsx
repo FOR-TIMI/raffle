@@ -51,7 +51,7 @@ const Dashboard: React.FC = () => {
         ) : (
           <>
             <LuPlus className="mr-2" />
-            Create Draw
+            Create Raffle
           </>
         )}
       </button>
