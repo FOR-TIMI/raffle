@@ -106,10 +106,7 @@ const raffleSlice = createSlice({
                 const winner = action.payload.winners.find(
                   (w) => w.email === participant.email
                 );
-                if (winner) {
-                  return { ...participant, isWinner: true };
-                }
-                return participant;
+                return { ...participant, isWinner: !!winner };
               }
             );
 
@@ -181,22 +178,14 @@ const raffleSlice = createSlice({
               })
             ),
           };
-        }
 
-        // Reset the raffle in the raffles array
-        state.raffles = state.raffles.map((raffle) => {
-          if (raffle._id === action.payload._id) {
-            return {
-              ...raffle,
-              winnerCount: 0,
-              participants: raffle.participants?.map((participant) => ({
-                ...participant,
-                isWinner: false,
-              })),
-            };
-          }
-          return raffle;
-        });
+          state.raffles = state.raffles.map((raffle) => {
+            if (raffle._id === state.currentRaffle?._id) {
+              return state.currentRaffle;
+            }
+            return raffle;
+          });
+        }
 
         state.isResetting = false;
       });

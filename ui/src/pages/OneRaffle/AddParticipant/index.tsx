@@ -33,7 +33,7 @@ const AddParticipantForm: React.FC = () => {
 
       setTimeout(() => {
         navigate(PAGE_ROUTES.ONE_DRAW.replace(":id", _id));
-      }, 1000);
+      }, 0);
     } catch (err) {
       dispatch(
         openAlertWithAutoClose(
