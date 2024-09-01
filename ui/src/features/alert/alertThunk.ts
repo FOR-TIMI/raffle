@@ -3,7 +3,7 @@ import { AppThunk } from "../../config/store";
 import { closeAlert, openAlert } from "./alertSlice";
 
 export const openAlertWithAutoClose =
-  (message: string, alertType: AlertColor, duration: number = 5000): AppThunk =>
+  (message: string, alertType: AlertColor, duration: number = 3000): AppThunk =>
   (dispatch) => {
     dispatch(openAlert({ message, alertType }));
 
