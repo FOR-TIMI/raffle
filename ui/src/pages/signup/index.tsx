@@ -1,4 +1,4 @@
-import AuthBanner from "../../components/common/AuthBanner";
+import AuthBanner from "../../components/Common/AuthBanner";
 import SignUpForm from "../../features/auth/form/signup";
 
 type Props = {};

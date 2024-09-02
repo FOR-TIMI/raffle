@@ -7,7 +7,7 @@ import { RxReset } from "react-icons/rx";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
-import PageWrapper from "../../components/common/PageWrapper";
+import PageWrapper from "../../components/Common/PageWrapper";
 import Sidebar from "../../components/Smart/SideBar/SideBar";
 import SidebarItem from "../../components/Smart/SideBar/SideBarItem";
 import WinnerBanner from "../../components/Smart/WinnerBanner";

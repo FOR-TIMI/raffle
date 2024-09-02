@@ -8,8 +8,15 @@ const ParticipantList = () => {
     (state: RootState) => state.raffle.currentRaffle
   );
   const status = useSelector((state: RootState) => state.raffle.status);
+  const isRefreshing = useSelector(
+    (state: RootState) => state.raffle.isRefreshing
+  );
+  const isResetting = useSelector(
+    (state: RootState) => state.raffle.isResetting
+  );
+  const isDeleting = useSelector((state: RootState) => state.raffle.isDeleting);
 
-  if (status === "loading") {
+  if (status === "loading" || isRefreshing || isResetting || isDeleting) {
     return <div>Loading participants...</div>;
   }
 
@@ -17,8 +24,12 @@ const ParticipantList = () => {
     return <div>Error loading participants</div>;
   }
 
-  if (!currentRaffle || !currentRaffle.participants) {
-    return <div>No participants found</div>;
+  if (
+    !currentRaffle ||
+    !currentRaffle.participants ||
+    !currentRaffle.participants.length
+  ) {
+    return <div>There are no participants for this raffle yet</div>;
   }
 
   return (

@@ -1,6 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
+import AuthenticatedLayout from "../../components/Layout/AuthenticatedLayout";
 import { RootState } from "../store";
 
 const RequireAuth: React.FC = () => {
@@ -15,7 +16,11 @@ const RequireAuth: React.FC = () => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  return <Outlet />;
+  return (
+    <AuthenticatedLayout>
+      <Outlet />
+    </AuthenticatedLayout>
+  );
 };
 
 export default RequireAuth;

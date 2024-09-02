@@ -2,6 +2,48 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "Avenir";
+  src: url("./assets/font/Avenir\ Book.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Avenir";
+  src: url("./assets/font/Avenir\ Light.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Avenir";
+  src: url("./assets/font/Avenir\ Regular.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Avenir";
+  src: url("./assets/font/Avenir-Medium.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Avenir";
+  src: url("./assets/font/Avenir\ Heavy.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Avenir";
+  src: url("./assets/font/Avenir-Black.ttf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -9,6 +51,6 @@
 }
 
 body {
-  font-family: "Roboto", sans-serif;
+  font-family: "Avenir", sans-serif;
   background-color: #f4f4f4;
 }

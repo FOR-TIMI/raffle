@@ -5,7 +5,7 @@ import { MdArrowBack } from "react-icons/md";
 import { RiFileExcel2Line } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
 import { Outlet, useLocation } from "react-router-dom";
-import ParticipantsButton from "../../components/common/ParticipantsButton";
+import ParticipantsButton from "../../components/Common/ParticipantsButton";
 import { PAGE_ROUTES } from "../../config/constants";
 import { AppDispatch, RootState } from "../../config/store";
 import { fetchRaffleDetails } from "../../features/raffle/raffleThunk";
@@ -19,10 +19,10 @@ const ParticipantsList: React.FC = () => {
 
   const [isLoading, setIsLoading] = useState(true);
 
-  const { currentRaffle, isResetting, isRefreshing } = useSelector(
-    (state: RootState) => state.raffle
+  const currentRaffle = useSelector(
+    (state: RootState) => state.raffle.currentRaffle
   );
-  const { _id: raffleId, participantCount } = currentRaffle;
+  const { _id: raffleId, winnerCount } = currentRaffle;
 
   const isAddParticipantPage = location.pathname.includes("/add-participant");
 
@@ -70,16 +70,6 @@ const ParticipantsList: React.FC = () => {
     [isAddParticipantPage, title, navToUrl]
   );
 
-  const TextComponent = useMemo(() => {
-    if (isRefreshing || isResetting) {
-      return <Box>Loading participants...</Box>;
-    }
-    if (!participantCount && !isAddParticipantPage) {
-      return <Box>There are no participants for this raffle yet</Box>;
-    }
-    return null;
-  }, [isRefreshing, isResetting, participantCount, isAddParticipantPage]);
-
   useEffect(() => {
     if (raffleId) {
       setIsLoading(true);
@@ -103,9 +93,8 @@ const ParticipantsList: React.FC = () => {
   }
 
   return (
-    <ParticipantsWrapper title={title} Button={ButtonGroup}>
+    <ParticipantsWrapper title={title} Button={!winnerCount && ButtonGroup}>
       <Outlet />
-      {TextComponent}
     </ParticipantsWrapper>
   );
 };

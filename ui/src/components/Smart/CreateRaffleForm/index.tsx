@@ -12,14 +12,14 @@ import {
 import { Formik, FormikHelpers } from "formik";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import TransitionAlerts from "../../../components/common/Alert";
-import TextField from "../../../components/common/TextField";
 import { PAGE_ROUTES } from "../../../config/constants";
 import { openAlertWithAutoClose } from "../../../features/alert/alertThunk";
 import { createRaffleThunk } from "../../../features/raffle/raffleThunk";
 import { useAppDispatch } from "../../../hooks/useAppDispatch";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import { RaffleCreateParams } from "../../../types";
+import TransitionAlerts from "../../Common/Alert";
+import TextField from "../../Common/TextField";
 import { initialValues, schema } from "./config";
 
 const CreateRaffleForm: React.FC = () => {
