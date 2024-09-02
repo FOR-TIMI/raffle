@@ -1,4 +1,4 @@
-import AuthBanner from "../../components/common/AuthBanner";
+import AuthBanner from "../../components/Common/AuthBanner";
 import AuthForm from "../../features/auth/form/login";
 
 type Props = {};

@@ -7,7 +7,7 @@ import { AppDispatch } from "../../../config/store";
 import { createRaffleThunk } from "../../../features/raffle/raffleThunk";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import { RaffleCreateParams } from "../../../types";
-import PageWrapper from "../../common/PageWrapper";
+import PageWrapper from "../../Common/PageWrapper";
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();

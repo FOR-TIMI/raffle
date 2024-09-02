@@ -1,10 +1,10 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import AuthenticatedLayout from "../../components/Layout/AuthenticatedLayout";
+import PublicLayout from "../../components/Layout/PublicLayout";
 import { RootState } from "../store";
 
-const RequireAuth: React.FC = () => {
+const NoAuthRequired: React.FC = () => {
   const auth = useSelector((state: RootState) => state.auth);
   const location = useLocation();
 
@@ -12,15 +12,15 @@ const RequireAuth: React.FC = () => {
     return <div>Loading...</div>;
   }
 
-  if (!auth.isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+  if (auth.isAuthenticated) {
+    return <Navigate to="/" state={{ from: location }} replace />;
   }
 
   return (
-    <AuthenticatedLayout>
+    <PublicLayout>
       <Outlet />
-    </AuthenticatedLayout>
+    </PublicLayout>
   );
 };
 
-export default RequireAuth;
+export default NoAuthRequired;

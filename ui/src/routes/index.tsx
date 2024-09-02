@@ -1,23 +1,30 @@
 import { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 import CreateRaffleForm from "../components/Smart/CreateRaffleForm";
-import DrawsList from "../components/Smart/DrawList";
-import RequireAuth from "../config/api/RequireAuth";
 import { PAGE_ROUTES } from "../config/constants";
-import AddParticipantForm from "../pages/OneRaffle/AddParticipant";
-import ParticipantsList from "../pages/OneRaffle/ParticipantList";
 
 const LoginPage = lazy(() => import("../pages/login"));
 const SignUpPage = lazy(() => import("../pages/signup"));
 const DashboardPage = lazy(() => import("../pages/home"));
 const OneRaffle = lazy(() => import("../pages/OneRaffle"));
+const DrawsList = lazy(() => import("../components/Smart/DrawList"));
+const RequireAuth = lazy(() => import("../config/api/RequireAuth"));
+const ParticipantsList = lazy(
+  () => import("../pages/OneRaffle/ParticipantList")
+);
+const AddParticipantForm = lazy(
+  () => import("../pages/OneRaffle/AddParticipant")
+);
+const NoAuthRequired = lazy(() => import("../config/api/NoAuthRequired"));
 
 const AppRoutes = () => {
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <Routes>
-        <Route path="/signup" element={<SignUpPage />} />
-        <Route path="/login" element={<LoginPage />} />
+        <Route element={<NoAuthRequired />}>
+          <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/login" element={<LoginPage />} />
+        </Route>
 
         <Route element={<RequireAuth />}>
           <Route path={PAGE_ROUTES.HOME} element={<DashboardPage />}>

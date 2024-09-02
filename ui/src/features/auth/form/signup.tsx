@@ -9,13 +9,13 @@ import {
 
 /** Components */
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
-import TransitionAlerts from "../../../components/common/Alert";
-import TiLink from "../../../components/common/TiLink";
+import TransitionAlerts from "../../../components/Common/Alert";
+import TiLink from "../../../components/Common/TiLink";
 
 /** Store */
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import TextField from "../../../components/common/TextField";
+import TextField from "../../../components/Common/TextField";
 import { PAGE_ROUTES } from "../../../config/constants";
 import { openAlertWithAutoClose } from "../../../features/alert/alertThunk";
 import { useAppDispatch } from "../../../hooks/useAppDispatch";
