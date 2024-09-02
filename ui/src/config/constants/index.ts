@@ -8,6 +8,7 @@ export const PAGE_ROUTES = {
   ONE_DRAW: "/draws/:id",
   CREATE_RAFFLE: "create",
   ADD_PARTICIPANT: "add-participant",
+  DRAWS: "/draws",
 };
 
 export const USER_API_ROUTES = {
@@ -35,4 +36,5 @@ export const RAFFLES_API_ROUTES = {
   GET_RAFFLE_PARTICIPANTS: "/raffles/:raffleId/participants",
   GET_RAFFLE_WINNERS: "/raffles/:raffleId/winners",
   RESET_RAFFLE: "/raffles/:raffleId/reset",
+  UPLOAD_PARTICIPANTS: "/raffles/:raffleId/participants/upload",
 };

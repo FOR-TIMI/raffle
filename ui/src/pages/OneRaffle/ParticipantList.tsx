@@ -1,12 +1,9 @@
 import { Grid } from "@mui/material";
-import React from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../config/store";
 import OneParticipant from "./OneParticipant";
 
-type Props = {};
-
-const ParticipantList = (props: Props) => {
+const ParticipantList = () => {
   const currentRaffle = useSelector(
     (state: RootState) => state.raffle.currentRaffle
   );

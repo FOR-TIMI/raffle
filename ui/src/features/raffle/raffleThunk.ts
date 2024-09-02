@@ -2,6 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { AxiosInstance } from "axios";
 import { RootState } from "../../config/store";
 import {
+  AddParticipantParams,
   CreateRaffleResponse,
   RaffleCreateParams,
   RaffleResponse,
@@ -10,6 +11,7 @@ import {
 } from "../../types";
 import {
   addParticipant,
+  addParticipantWithFile,
   createRaffle,
   deleteRaffle,
   getRaffle,
@@ -60,19 +62,37 @@ export const createRaffleThunk = createAsyncThunk<
 
 export const addParticipantThunk = createAsyncThunk<
   RaffleResponse,
-  { raffleId: string; participant: User; axios: AxiosInstance },
+  AddParticipantParams,
   { rejectValue: any }
->(
-  "raffles/addParticipant",
-  async ({ raffleId, participant, axios }, { rejectWithValue }) => {
-    try {
-      const data = await addParticipant(raffleId, participant, axios);
-      return data;
-    } catch (error) {
-      return rejectWithValue((error as any).response?.data);
+>("raffles/addParticipant", async (params, { rejectWithValue }) => {
+  try {
+    let data: RaffleResponse;
+
+    if (params.type === "file") {
+      const formData = new FormData();
+      formData.append("file", params.payload as File);
+      data = await addParticipantWithFile(
+        formData,
+        params.raffleId,
+        params.axios
+      );
+    } else if (params.type === "manual" && !!params.payload) {
+      data = await addParticipant(
+        params.raffleId,
+        params.payload as User,
+        params.axios
+      );
+    } else {
+      throw new Error(
+        "Invalid payload: either participant or file must be provided"
+      );
     }
+    return data;
+  } catch (error) {
+    return rejectWithValue((error as any).response?.data);
   }
-);
+});
+
 export const fetchRaffleDetails = createAsyncThunk<
   RaffleResponse,
   { id: string; axios: AxiosInstance },

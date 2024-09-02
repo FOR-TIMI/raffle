@@ -94,3 +94,21 @@ export const deleteRaffle = async (
   );
   return response.data;
 };
+
+export const addParticipantWithFile = async (
+  formData: FormData,
+  raffleId: string,
+  axios: AxiosInstance
+): Promise<RaffleResponse> => {
+  const response = await axios.post(
+    RAFFLES_API_ROUTES.UPLOAD_PARTICIPANTS.replace(":raffleId", raffleId),
+    formData,
+    {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+  return response.data;
+};
