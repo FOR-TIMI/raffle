@@ -1,3 +1,5 @@
+import { AxiosInstance } from "axios";
+
 type Status = "idle" | "loading" | "succeeded" | "failed";
 type Error = string | null;
 
@@ -67,3 +69,15 @@ export interface SpinRaffleResponse {
   };
   winners: User[];
 }
+
+export interface AddParticipantParamsParent<T extends "manual" | "file"> {
+  raffleId: string;
+  axios: AxiosInstance;
+  type: T;
+  payload: T extends "manual" ? User : File;
+}
+
+// Helper type for the thunk
+export type AddParticipantParams =
+  | AddParticipantParamsParent<"manual">
+  | AddParticipantParamsParent<"file">;

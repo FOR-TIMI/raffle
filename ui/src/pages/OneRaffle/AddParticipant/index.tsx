@@ -3,13 +3,17 @@ import { Formik, FormikHelpers } from "formik";
 import React from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { ref } from "yup";
 import TransitionAlerts from "../../../components/common/Alert";
 import TextField from "../../../components/common/TextField";
 import { PAGE_ROUTES } from "../../../config/constants";
 import { RootState } from "../../../config/store";
 import { openAlertWithAutoClose } from "../../../features/alert/alertThunk";
-import { addParticipantToCurrentRaffle } from "../../../features/raffle/raffleSlice";
-import { addParticipantThunk } from "../../../features/raffle/raffleThunk";
+
+import {
+  addParticipantThunk,
+  refreshRaffleDetails,
+} from "../../../features/raffle/raffleThunk";
 import { useAppDispatch } from "../../../hooks/useAppDispatch";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import { User } from "../../../types";
@@ -26,9 +30,15 @@ const AddParticipantForm: React.FC = () => {
     { resetForm, setSubmitting }: FormikHelpers<User>
   ) => {
     try {
-      const payload = { participant: values, raffleId: _id };
-      await dispatch(addParticipantThunk({ axios, ...payload })).unwrap();
-      dispatch(addParticipantToCurrentRaffle(values));
+      await dispatch(
+        addParticipantThunk({
+          axios,
+          raffleId: _id,
+          payload: values,
+          type: "manual",
+        })
+      ).unwrap();
+      await dispatch(refreshRaffleDetails({ axios, id: _id }));
       dispatch(openAlertWithAutoClose("Participant Added", "success", 1000));
 
       setTimeout(() => {

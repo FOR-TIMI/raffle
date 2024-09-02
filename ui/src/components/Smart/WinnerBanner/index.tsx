@@ -4,7 +4,10 @@ import { LuPartyPopper } from "react-icons/lu";
 import { useDispatch, useSelector } from "react-redux";
 import winnerBannerimg from "../../../assets/image/winner-banner.png";
 import { AppDispatch, RootState } from "../../../config/store";
-import { spinRaffleThunk } from "../../../features/raffle/raffleThunk";
+import {
+  refreshRaffleDetails,
+  spinRaffleThunk,
+} from "../../../features/raffle/raffleThunk";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import WinnersList from "./WinnersList";
 
@@ -25,12 +28,10 @@ const WinnerBanner = () => {
   const handleSpinDraw = useCallback(() => {
     setIsLoading(true);
     dispatch(spinRaffleThunk({ raffleId: currentRaffle?._id, axios }))
-      .then(() => {
-        setIsLoading(false);
-      })
-      .catch(() => {
-        setIsLoading(false);
-      });
+      .then(() =>
+        dispatch(refreshRaffleDetails({ id: currentRaffle?._id, axios }))
+      )
+      .finally(() => setIsLoading(false));
   }, [dispatch, currentRaffle?._id, axios]);
 
   const component = useMemo(() => {
@@ -75,7 +76,7 @@ const WinnerBanner = () => {
         )}
       </Button>
     );
-  }, [winners.length, isLoading, handleSpinDraw, currentRaffle]);
+  }, [winners, isLoading, handleSpinDraw, currentRaffle]);
 
   return (
     <Box

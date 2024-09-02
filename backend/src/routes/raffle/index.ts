@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import {
   createRaffleHandler,
   deleteRaffleHandler,
@@ -11,6 +11,7 @@ import {
   removeParticipantFromRaffleHandler,
   resetRaffleHandler,
   spinRaffleHandler,
+  uploadParticipantsFileHandler,
 } from "../../controller/raffle";
 
 import isRaffleCreator from "../../middleware/raffleAuthor";
@@ -20,6 +21,7 @@ import validateResource from "../../middleware/validate";
 import { conditionalValidateResourceIfSignedIn } from "../../middleware/conditionalValidateSignedIn";
 import {
   createRaffleSchema,
+  CustomFile,
   GetParticipantsParams,
   GetParticipantsQuery,
   getParticipantsSchema,
@@ -30,7 +32,11 @@ import {
   ResetRaffleParams,
   resetRaffleSchema,
   spinRaffleSchema,
+  UploadParticipantsRequest,
+  uploadParticipantsSchema,
 } from "../../schemas/raffle";
+import { isCustomFile } from "../../service/raffle";
+import upload from "../../utils/Multer";
 
 const router = express.Router();
 const baseEndpoint = "/raffles";
@@ -113,4 +119,23 @@ router.get<ResetRaffleParams>(
   resetRaffleHandler
 );
 
+/** Upload Raffle participants file */
+router.post(
+  buildEndpoint(":raffleId/participants/upload"),
+  requireUser,
+  isRaffleCreator,
+  upload.single("file"),
+  validateResource(uploadParticipantsSchema),
+  async (req: Request, res: Response) => {
+    // Type assertion to CustomFile
+    const file = req.file as CustomFile | undefined;
+
+    if (!isCustomFile(file)) {
+      return res.status(400).json({ message: "Invalid file type." });
+    }
+
+    // Call your handler function
+    return uploadParticipantsFileHandler(req as UploadParticipantsRequest, res);
+  }
+);
 export default router;

@@ -15,12 +15,13 @@ import {
   RemoveParticipantFromRaffleParams,
   ResetRaffleParams,
   SpinRaffleParams,
+  UploadParticipantsRequest,
 } from "../../schemas/raffle";
 
 import mongoose from "mongoose";
 import RaffleParticipantModel from "../../model/raffle/participant";
 import MailService from "../../service/mail";
-import { getOneRaffle } from "../../service/raffle";
+import { getOneRaffle, processExcelFile } from "../../service/raffle";
 import { shuffleArray } from "../../utils/helpers";
 
 export async function createRaffleHandler(
@@ -423,7 +424,7 @@ export async function resetRaffleHandler(
     }
 
     if (raffle.winnerCount === 0) {
-      return res.status(400).json({ message: "Raffle has not been spun yet" });
+      return res.status(200).json({ message: "Raffle has not been spun yet" });
     }
 
     // Reset winner status for all participants
@@ -442,5 +443,37 @@ export async function resetRaffleHandler(
   } catch (error) {
     console.error("Error resetting raffle:", error);
     res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+export async function uploadParticipantsFileHandler(
+  req: UploadParticipantsRequest,
+  res: Response
+) {
+  const raffleId = req.params.raffleId;
+  const file = req.file;
+
+  if (!file) {
+    return res.status(400).json({ message: "No file uploaded" });
+  }
+
+  try {
+    const { processedCount, skippedCount } = await processExcelFile(
+      file.buffer,
+      raffleId
+    );
+
+    await RaffleModel.findByIdAndUpdate(raffleId, {
+      $inc: { participantCount: processedCount },
+    });
+
+    return res.status(200).json({
+      message: "Participants added successfully",
+      processedCount,
+      skippedCount,
+    });
+  } catch (error) {
+    console.error("Error processing participants file:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 }

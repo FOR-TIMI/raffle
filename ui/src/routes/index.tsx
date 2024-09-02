@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import CreateRaffleForm from "../components/Smart/CreateRaffleForm";
 import DrawsList from "../components/Smart/DrawList";
 import RequireAuth from "../config/api/RequireAuth";

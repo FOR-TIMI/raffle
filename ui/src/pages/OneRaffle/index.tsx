@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import React, { useCallback, useEffect, useMemo } from "react";
 import { FiRefreshCw } from "react-icons/fi";
 import { LuLayoutDashboard } from "react-icons/lu";
@@ -59,6 +59,7 @@ const OneRaffle: React.FC = () => {
   const handleReset = useCallback(() => {
     if (id) {
       dispatch(resetRaffleThunk({ raffleId: id, axios }));
+      dispatch(refreshRaffleDetails({ id, axios }));
     }
   }, [id, dispatch, axios]);
 
@@ -67,16 +68,27 @@ const OneRaffle: React.FC = () => {
       <Button
         startIcon={<Icon />}
         onClick={onClick}
-        variant="contained"
         disabled={isLoading}
         className="mb-4"
         sx={{
-          backgroundColor: "#fff",
-          color: "black",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          bgcolor: "#fff",
           boxShadow: "none",
+          border: "1px solid rgb(249 250 251)",
+          borderRadius: "0.5rem",
+          transition: "all 0.5s",
+          color: "#000",
+          padding: "8px 20px",
+
           "&:hover": {
-            backgroundColor: "#fff",
-            color: "black",
+            bgcolor: "#f0f0f0",
+            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
+          },
+          "&:active": {
+            transform: "scale(0.95)",
+            bgcolor: "#fff",
           },
         }}
       >
