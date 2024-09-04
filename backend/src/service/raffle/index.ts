@@ -2,6 +2,7 @@ import xlsx from "xlsx";
 import RaffleModel from "../../model/raffle";
 import RaffleParticipantModel from "../../model/raffle/participant";
 import { CustomFile } from "../../schemas/raffle";
+import capitalize from "../../utils/capitalize";
 
 export async function getOneRaffle(userEmail: string) {
   return await RaffleModel.find({ creatorEmail: userEmail }).lean();
@@ -15,7 +16,7 @@ interface ExcelRow {
   [key: string]: any;
 }
 
-const BATCH_SIZE = 1000; // Adjust based on your needs and system capabilities
+const BATCH_SIZE = 1000;
 
 export async function processExcelFile(fileBuffer: Buffer, raffleId: string) {
   const workbook = xlsx.read(fileBuffer, { type: "buffer" });
@@ -49,43 +50,39 @@ export async function processExcelFile(fileBuffer: Buffer, raffleId: string) {
       continue;
     }
 
-    const atIndex = email.indexOf("@");
-    const dotIndex = email.lastIndexOf(".");
-    if (atIndex <= 0 || dotIndex <= atIndex + 1) {
+    const [namePart, domain] = email.split("@");
+    const [firstName, lastName] = namePart.split(".");
+
+    if (!firstName || !lastName) {
       console.warn(`Invalid email format: ${email}. Skipping this row.`);
       skippedCount++;
       continue;
     }
 
-    const namePart = email.slice(0, atIndex);
-    const dotInNameIndex = namePart.indexOf(".");
-    let firstName, lastName;
-
-    if (dotInNameIndex !== -1) {
-      firstName = namePart.slice(0, dotInNameIndex);
-      lastName = namePart.slice(dotInNameIndex + 1);
-    } else {
-      firstName = namePart;
-      lastName = "";
-    }
+    const capitalizedFirstName = capitalize(firstName);
+    const capitalizedLastName = capitalize(lastName);
 
     const exclude = positiveResponses.has(
-      String(row["Exclude"] || row["exclude"]).toLowerCase()
+      String(row["Exclude"] || row["exclude"] || "").toLowerCase()
     );
-    console.log({ email, firstName, lastName, exclude });
 
     if (!exclude) {
       batch.push({
         raffle: raffleId,
         email,
-        firstName,
-        lastName,
+        firstName: capitalizedFirstName,
+        lastName: capitalizedLastName,
         isWinner: false,
       });
 
       if (batch.length >= BATCH_SIZE) {
-        await RaffleParticipantModel.insertMany(batch);
-        processedCount += batch.length;
+        try {
+          await RaffleParticipantModel.insertMany(batch);
+          processedCount += batch.length;
+        } catch (error) {
+          console.error("Error inserting batch:", error);
+          console.error("Problematic batch:", JSON.stringify(batch, null, 2));
+        }
         batch = [];
       }
     } else {
@@ -95,8 +92,13 @@ export async function processExcelFile(fileBuffer: Buffer, raffleId: string) {
 
   // Insert any remaining documents
   if (batch.length > 0) {
-    await RaffleParticipantModel.insertMany(batch);
-    processedCount += batch.length;
+    try {
+      await RaffleParticipantModel.insertMany(batch);
+      processedCount += batch.length;
+    } catch (error) {
+      console.error("Error inserting final batch:", error);
+      console.error("Problematic batch:", JSON.stringify(batch, null, 2));
+    }
   }
 
   return { processedCount, skippedCount };

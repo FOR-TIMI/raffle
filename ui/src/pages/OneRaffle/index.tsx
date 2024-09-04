@@ -150,10 +150,6 @@ const OneRaffle: React.FC = () => {
 
   return (
     <>
-      <Sidebar>
-        <SidebarItem alert={true} icon={LuLayoutDashboard} text="Home" active />
-      </Sidebar>
-
       <section className="flex">
         <PageWrapper
           status={raffleDetails.winnerCount > 0 ? "Inactive" : "Active"}

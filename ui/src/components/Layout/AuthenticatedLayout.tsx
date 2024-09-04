@@ -12,8 +12,10 @@ const Footer = lazy(() => import("../Common/Footer"));
 
 const AuthenticatedLayout = ({ children }: Props) => {
   return (
-    <main>
-      <Box className="flex" position="relative" top={0} overflow="hidden">
+    <main
+      style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+    >
+      <Box className="flex-grow" position="relative" top={0} overflow="hidden">
         <Sidebar>
           <SidebarItem
             alert={true}

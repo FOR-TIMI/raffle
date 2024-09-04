@@ -11,7 +11,7 @@ type Props = {
 const PageWrapper = ({ children, title, Component, status }: Props) => {
   const isActive = status === "Active";
   return (
-    <div className="w-full h-screen my-10">
+    <div className="w-full min-h-full my-10">
       <div className="mx-auto w-[90%] max-w-[1000px] my-10">
         <div className="flex flex-col md:flex-row items-center justify-between w-full">
           <Typography
