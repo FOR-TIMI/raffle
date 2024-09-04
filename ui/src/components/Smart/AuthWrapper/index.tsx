@@ -14,9 +14,12 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
   const axios = useAxiosPrivate();
 
   useEffect(() => {
-    if (!auth.isAuthenticated && auth.status === "idle") {
-      dispatch(checkAuthThunk(axios));
-    }
+    const checkAUth = async () => {
+      if (!auth.isAuthenticated && auth.status === "idle") {
+        await dispatch(checkAuthThunk(axios)).unwrap();
+      }
+    };
+    checkAUth();
   }, [dispatch, auth.isAuthenticated, auth.status]);
 
   if (auth.status === "loading") {

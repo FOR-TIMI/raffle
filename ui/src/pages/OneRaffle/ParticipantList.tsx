@@ -8,6 +8,10 @@ const ParticipantList = () => {
     (state: RootState) => state.raffle.currentRaffle
   );
   const status = useSelector((state: RootState) => state.raffle.status);
+  const isAuthor = useSelector(
+    (state: RootState) => state.auth.user.email === currentRaffle?.creatorEmail
+  );
+
   const isRefreshing = useSelector(
     (state: RootState) => state.raffle.isRefreshing
   );
@@ -36,7 +40,11 @@ const ParticipantList = () => {
     <Grid container spacing={2}>
       {currentRaffle.participants.map((participant, i) => (
         <Grid item xs={12} sm={6} md={4} key={i}>
-          <OneParticipant participant={participant} />
+          <OneParticipant
+            participant={participant}
+            isAuthor={isAuthor}
+            raffleId={currentRaffle._id}
+          />
         </Grid>
       ))}
     </Grid>

@@ -7,6 +7,7 @@ import {
   fetchRaffleDetails,
   getUserRafflesThunk,
   refreshRaffleDetails,
+  removeParticipantFromRaffleThunk,
   resetRaffleThunk,
   spinRaffleThunk,
 } from "./raffleThunk";
@@ -188,6 +189,45 @@ const raffleSlice = createSlice({
         }
 
         state.isResetting = false;
+      })
+      .addCase(removeParticipantFromRaffleThunk.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(removeParticipantFromRaffleThunk.fulfilled, (state, action) => {
+        const removedParticipantId = action.meta.arg.participantId;
+        const currentRaffleId = state.currentRaffle?._id;
+
+        if (currentRaffleId) {
+          // Update the current raffle in the raffles array
+          const raffleIndex = state.raffles.findIndex(
+            (raffle) => raffle._id === currentRaffleId
+          );
+          if (raffleIndex !== -1) {
+            const updatedRaffle = { ...state.raffles[raffleIndex] };
+            updatedRaffle.participants = updatedRaffle.participants?.filter(
+              (p) => p.id !== removedParticipantId
+            );
+            updatedRaffle.participantCount--;
+            state.raffles[raffleIndex] = updatedRaffle;
+          }
+
+          // Update the currentRaffle
+          if (state.currentRaffle) {
+            state.currentRaffle = {
+              ...state.currentRaffle,
+              participants: state.currentRaffle.participants?.filter(
+                (p) => p.id !== removedParticipantId
+              ),
+              participantCount: state.currentRaffle.participantCount - 1,
+            };
+          }
+        }
+
+        state.status = "succeeded";
+      })
+      .addCase(removeParticipantFromRaffleThunk.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message || "An error occurred";
       });
   },
 });
