@@ -112,3 +112,25 @@ export const addParticipantWithFile = async (
   );
   return response.data;
 };
+
+export const removeParticipantFromRaffle = async (
+  raffleId: string,
+  participantId: string,
+  axios: AxiosInstance
+): Promise<{ message: string }> => {
+  // Implement this function
+  const response = await axios.delete(
+    RAFFLES_API_ROUTES.REMOVE_RAFFLE_PARTICIPANT.replace(
+      ":raffleId",
+      raffleId
+    ).replace(":participantId", participantId),
+    {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+
+  return response.data;
+};

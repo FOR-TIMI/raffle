@@ -16,6 +16,7 @@ import {
   deleteRaffle,
   getRaffle,
   getUserRaffles,
+  removeParticipantFromRaffle,
   resetRaffle,
   spinRaffle,
 } from "./raffleApi";
@@ -154,3 +155,22 @@ export const deleteRaffleThunk = createAsyncThunk<
     return rejectWithValue((error as any).response?.data);
   }
 });
+
+export const removeParticipantFromRaffleThunk = createAsyncThunk<
+  { message: string },
+  { raffleId: string; participantId: string; axios: AxiosInstance }
+>(
+  "raffles/removeParticipant",
+  async ({ raffleId, participantId, axios }, { rejectWithValue }) => {
+    try {
+      const data = await removeParticipantFromRaffle(
+        raffleId,
+        participantId,
+        axios
+      );
+      return data;
+    } catch (error) {
+      return rejectWithValue((error as any).response?.data);
+    }
+  }
+);

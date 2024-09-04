@@ -30,8 +30,7 @@ export const RAFFLES_API_ROUTES = {
   GET_USER_JOINED_RAFFLES: "/raffles/joined",
   GET_RAFFLE_DETAILS: "/raffles/:raffleId",
   DELETE_RAFFLE: "/raffles/:raffleId",
-  REMOVE_RAFFLE_PARTICIPANT:
-    "/raffles/:raffleId/participants/:participantEmail",
+  REMOVE_RAFFLE_PARTICIPANT: "/raffles/:raffleId/participants/:participantId",
   SPIN_RAFFLE: "/raffles/:raffleId/spin",
   GET_RAFFLE_PARTICIPANTS: "/raffles/:raffleId/participants",
   GET_RAFFLE_WINNERS: "/raffles/:raffleId/winners",

@@ -80,7 +80,7 @@ router.delete(
 
 /** Remove Participant from raffle */
 router.delete(
-  buildEndpoint(":raffleId/participants/:participantEmail"),
+  buildEndpoint(":raffleId/participants/:participantId"),
   requireUser,
   isRaffleCreator,
   validateResource(removeParticipantFromRaffleSchema),
