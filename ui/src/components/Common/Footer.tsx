@@ -9,7 +9,7 @@ const Footer = () => {
         padding: "20px 0",
         margin: "0",
         width: "100%",
-        position: "absolute",
+        zIndex: 100,
       }}
     >
       <Box

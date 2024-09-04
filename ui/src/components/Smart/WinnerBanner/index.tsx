@@ -82,11 +82,12 @@ const WinnerBanner = () => {
     <Box
       sx={{
         width: "100%",
-        height: "360px",
+        minHeight: "360px",
         background: `url(${winnerBannerimg})`,
         border: "1px solid #fff",
         margin: "1rem 0",
         borderRadius: "10px",
+        padding: "1rem",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",

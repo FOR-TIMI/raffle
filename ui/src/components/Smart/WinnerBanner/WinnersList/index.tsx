@@ -8,6 +8,8 @@ type Props = {
 };
 
 const WinnersList = ({ winners }: Props) => {
+  const gridItemSize = winners.length > 3 ? 4 : winners.length === 1 ? 12 : 6;
+
   return (
     <Box>
       <Box my="10px" display="flex" justifyContent="center" alignItems="center">
@@ -23,9 +25,17 @@ const WinnersList = ({ winners }: Props) => {
         <Trophy size={70} />
       </Box>
 
-      <Grid container spacing={2}>
+      <Grid container spacing={2} justifyContent="center">
         {winners.map((winner, i) => (
-          <Grid item xs={12} sm={6} md={winners.length > 3 ? 4 : 8} key={i}>
+          <Grid
+            item
+            xs={12}
+            sm={6}
+            md={gridItemSize}
+            key={i}
+            display="flex"
+            justifyContent="center"
+          >
             <OneWinner winner={winner} />
           </Grid>
         ))}
