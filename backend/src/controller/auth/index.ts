@@ -55,16 +55,16 @@ export async function createSessionHandler(
       maxAge: accessTokenTtl,
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      domain,
+      sameSite: "none",
+      // domain,
     });
 
     res.cookie("refreshToken", refreshToken, {
       maxAge: refreshTokenTtl,
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      domain,
+      sameSite: "none",
+      // domain,
     });
 
     log.info(`User ${user.id} logged in`);
