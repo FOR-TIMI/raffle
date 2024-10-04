@@ -1,6 +1,7 @@
 import config from "config";
 import { NextFunction, Request, Response } from "express";
 import { verifyJwt } from "../../utils/jwt";
+import log from "../../utils/Logger";
 
 const deserializeUser = async (
   req: Request,
@@ -9,7 +10,6 @@ const deserializeUser = async (
 ) => {
   try {
     let accessToken = "";
-    const defaultAccess = config.get<string>("access");
 
     // Try to get the token from the Authorization header
     const authHeader = req.headers.authorization;
@@ -18,8 +18,6 @@ const deserializeUser = async (
       accessToken = authHeader.split(" ")[1];
     } else if (req.cookies?.accessToken) {
       accessToken = req.cookies.accessToken;
-    } else if (defaultAccess) {
-      accessToken = defaultAccess;
     }
 
     if (!accessToken) {
@@ -27,9 +25,10 @@ const deserializeUser = async (
     }
 
     const decoded = verifyJwt(accessToken, "accessTokenPublicKey");
-    const s = verifyJwt(accessToken, "accessTokenPublicKey");
 
     if (decoded) {
+      log.info("Authorized user", decoded);
+      console.log(decoded);
       res.locals.user = decoded;
     } else {
       // If the token is invalid or expired, clear the cookie

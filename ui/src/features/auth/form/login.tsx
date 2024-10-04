@@ -10,7 +10,7 @@ import { PAGE_ROUTES } from "../../../config/constants";
 import { AppDispatch } from "../../../config/store";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import { openAlertWithAutoClose } from "../../alert/alertThunk";
-import { loginUser } from "../authThunk";
+import { checkAuthThunk, loginUser } from "../authThunk";
 import { initialValues, validationSchema } from "./validation";
 
 const AuthForm: React.FC = () => {
@@ -32,6 +32,7 @@ const AuthForm: React.FC = () => {
         try {
           setSubmitting(true);
           await dispatch(loginUser({ ...values, axios })).unwrap();
+          await dispatch(checkAuthThunk(axios)).unwrap();
           navigate(from, { replace: true });
         } catch (err) {
           dispatch(

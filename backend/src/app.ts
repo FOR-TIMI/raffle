@@ -3,10 +3,12 @@ require("dotenv").config();
 import config from "config";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import csurf from "csurf";
 import express from "express";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import { Server } from "http";
+import { csrfMiddleware } from "./middleware/csrfMiddleware";
 import deserializeUser from "./middleware/deserialize";
 import purify from "./middleware/domPurify";
 import sanitizerMongo from "./middleware/sanitize";
@@ -19,29 +21,33 @@ const app = express();
 const port = config.get<number>("port");
 const baseRoute = config.get<string>("baseRoute");
 
-// cookie parser
+// Security middleware
+const helmetConfig = config.get<object>("helmetConfig");
+app.use(helmet(helmetConfig));
+
+// Parse cookies
 app.use(cookieParser());
 
-const helmetConfig = config.get<object>("helmetConfig");
-
-// Security middleware
-app.use(helmet(helmetConfig));
+// Parse JSON bodies
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
-
-// Rate limiting
-const rateLimitConfig = config.get<object>("rateLimitConfig");
-const limiter = rateLimit(rateLimitConfig);
-
-app.use(sanitizerMongo());
-app.use(purify());
-app.use(limiter);
 
 // CORS configuration
 const corsOptions = config.get<object>("corsConfig");
 app.use(cors(corsOptions));
 
+// CSRF protection
+// app.use(csurf({ cookie: true }));
+// csrfMiddleware(app);
+
+// Rate limiting
+const rateLimitConfig = config.get<object>("rateLimitConfig");
+const limiter = rateLimit(rateLimitConfig);
+app.use(limiter);
+
 // Custom middleware
+app.use(sanitizerMongo());
+app.use(purify());
 app.use(deserializeUser);
 
 // Routes
