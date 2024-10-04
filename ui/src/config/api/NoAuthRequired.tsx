@@ -8,7 +8,7 @@ const NoAuthRequired: React.FC = () => {
   const auth = useSelector((state: RootState) => state.auth);
   const location = useLocation();
 
-  if (auth.status === "loading" || auth.status === "idle") {
+  if (auth && (auth.status === "loading" || auth.status === "idle")) {
     return <div>Loading...</div>;
   }
 

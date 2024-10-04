@@ -20,67 +20,57 @@ export async function createSessionHandler(
     const message = "Invalid email or password";
     const { email, password } = req.body;
 
-    // const user = await findUserByEmail(email);
+    const user = await findUserByEmail(email);
 
-    // if (!user) {
-    //   return res.status(200).json({ message: message });
-    // }
+    if (!user) {
+      return res.status(200).json({ message: message });
+    }
 
-    // if (!user.verifiedEmail) {
-    //   return res.status(400).json({ message: "Please verify your email" });
-    // }
+    if (!user.verifiedEmail) {
+      return res.status(400).json({ message: "Please verify your email" });
+    }
 
-    // const isVaild = await user.verifyPassword(password);
+    const isVaild = await user.verifyPassword(password);
 
-    // log.info(`User ${user.id} logged in is valid ${isVaild}`);
+    log.info(`User ${user.id} logged in is valid ${isVaild}`);
 
-    // if (!isVaild) {
-    //   return res.status(200).json({
-    //     message,
-    //   });
-    // }
+    if (!isVaild) {
+      return res.status(200).json({
+        message,
+      });
+    }
 
-    // const accessToken = signAccessToken(user);
-    // const refreshToken = await signRefreshToken({ userId: user.id });
+    const accessToken = signAccessToken(user);
+    const refreshToken = await signRefreshToken({ userId: user.id });
 
-    // const accessTokenTtl =
-    //   parseDuration(config.get<string>("accessTokenTtl")) || 15 * 60 * 1000; // default 15 minutes
-    // const refreshTokenTtl =
-    //   parseDuration(config.get<string>("refreshTokenTtl")) ||
-    //   7 * 24 * 60 * 60 * 1000; // default 7 days
+    const accessTokenTtl =
+      parseDuration(config.get<string>("accessTokenTtl")) || 15 * 60 * 1000; // default 15 minutes
+    const refreshTokenTtl =
+      parseDuration(config.get<string>("refreshTokenTtl")) ||
+      7 * 24 * 60 * 60 * 1000; // default 7 days
 
-    // const domain = config.get<string>("cookieDomain");
+    const domain = config.get<string>("cookieDomain");
 
-    // res.cookie("accessToken", accessToken, {
-    //   maxAge: accessTokenTtl,
-    //   httpOnly: true,
-    //   secure: process.env.NODE_ENV === "production",
-    //   sameSite: "strict",
-    //   domain,
-    // });
+    res.cookie("accessToken", accessToken, {
+      maxAge: accessTokenTtl,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      domain,
+    });
 
-    // res.cookie("refreshToken", refreshToken, {
-    //   maxAge: refreshTokenTtl,
-    //   httpOnly: true,
-    //   secure: process.env.NODE_ENV === "production",
-    //   sameSite: "strict",
-    //   domain,
-    // });
+    res.cookie("refreshToken", refreshToken, {
+      maxAge: refreshTokenTtl,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      domain,
+    });
 
-    // log.info(`User ${user.id} logged in`);
-
-    // console.log({ accessToken });
-    const defaultUser = config.get<{
-      id: string;
-      email: string;
-      firstName: string;
-      lastName: string;
-    }>("defaultUser");
+    log.info(`User ${user.id} logged in`);
 
     return res.status(200).json({
-      accessToken: "accessToken",
-      refreshToken: "refreshToken",
-      user: defaultUser,
+      message: "Login Successful",
     });
   } catch (e: any) {
     return res.status(500).json({ message: "Internal server error", error: e });

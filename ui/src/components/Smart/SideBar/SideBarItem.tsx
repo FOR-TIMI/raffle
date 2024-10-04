@@ -9,18 +9,20 @@ interface SidebarItemProps {
   text: string;
   active?: boolean;
   alert?: boolean;
+  to: string;
 }
 
 export default function SidebarItem({
   icon: Icon,
   text,
   active,
+  to,
 }: SidebarItemProps) {
   const { expanded } = useContext(SidebarContext);
 
   return (
     <NavLink
-      to={PAGE_ROUTES.HOME}
+      to={to}
       className={`
           relative flex items-center py-2 px-3 my-1
           font-medium rounded-md cursor-pointer

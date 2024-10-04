@@ -9,9 +9,13 @@ const useRefreshToken = () => {
 
   const refresh = async () => {
     try {
-      const response = await axios.post(USER_API_ROUTES.REFRESH_TOKEN, {
-        withCredentials: true,
-      });
+      const response = await axios.post(
+        USER_API_ROUTES.REFRESH_TOKEN,
+        {},
+        {
+          withCredentials: true,
+        }
+      );
       dispatch(setUser(response.data.user));
       return response.data.accessToken;
     } catch (error) {

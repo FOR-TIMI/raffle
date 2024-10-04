@@ -1,6 +1,7 @@
 import { Box } from "@mui/material";
 import React, { lazy } from "react";
 import { LuLayoutDashboard } from "react-icons/lu";
+import { PAGE_ROUTES } from "../../config/constants";
 import Sidebar from "../Smart/SideBar/SideBar";
 import SidebarItem from "../Smart/SideBar/SideBarItem";
 
@@ -21,6 +22,7 @@ const AuthenticatedLayout = ({ children }: Props) => {
             alert={true}
             icon={LuLayoutDashboard}
             text="Home"
+            to={PAGE_ROUTES.HOME}
             active
           />
         </Sidebar>
