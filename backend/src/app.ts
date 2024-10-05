@@ -8,6 +8,7 @@ import express from "express";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import { Server } from "http";
+import path from "path";
 import { csrfMiddleware } from "./middleware/csrfMiddleware";
 import deserializeUser from "./middleware/deserialize";
 import purify from "./middleware/domPurify";
@@ -20,6 +21,8 @@ import log from "./utils/Logger";
 const app = express();
 const port = config.get<number>("port");
 const baseRoute = config.get<string>("baseRoute");
+
+app.use(express.static(path.join(__dirname, "public")));
 
 // Security middleware
 const helmetConfig = config.get<object>("helmetConfig");
@@ -52,6 +55,15 @@ app.use(deserializeUser);
 
 // Routes
 app.use(baseRoute, router);
+
+// Fallback to index.html for client-side routing
+app.get("*", (req, res) => {
+  if (req.path.toLowerCase().startsWith(baseRoute)) {
+    res.status(404).json({ message: "API route not found" });
+  } else {
+    res.sendFile(path.join(__dirname, "../public", "index.html"));
+  }
+});
 
 // Error handling middleware
 app.use(errorHandler);

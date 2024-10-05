@@ -49,22 +49,18 @@ export async function createSessionHandler(
       parseDuration(config.get<string>("refreshTokenTtl")) ||
       7 * 24 * 60 * 60 * 1000; // default 7 days
 
-    const domain = config.get<string>("cookieDomain");
-
     res.cookie("accessToken", accessToken, {
       maxAge: accessTokenTtl,
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
-      // domain,
+      secure: true,
+      sameSite: "lax",
     });
 
     res.cookie("refreshToken", refreshToken, {
       maxAge: refreshTokenTtl,
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
-      // domain,
+      secure: true,
+      sameSite: "lax",
     });
 
     log.info(`User ${user.id} logged in`);
@@ -120,15 +116,15 @@ export async function refreshTokenHandler(req: Request, res: Response) {
   res.cookie("accessToken", accessToken, {
     maxAge: accessTokenTtl,
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    secure: true,
+    sameSite: "lax",
   });
 
   res.cookie("refreshToken", newRefreshToken, {
     maxAge: refreshTokenTtl,
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    secure: true,
+    sameSite: "lax",
   });
 
   return res.status(200).json({

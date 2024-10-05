@@ -27,8 +27,6 @@ const deserializeUser = async (
     const decoded = verifyJwt(accessToken, "accessTokenPublicKey");
 
     if (decoded) {
-      log.info("Authorized user", decoded);
-      console.log(decoded);
       res.locals.user = decoded;
     } else {
       // If the token is invalid or expired, clear the cookie
