@@ -9,7 +9,6 @@ import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import { Server } from "http";
 import path from "path";
-import { csrfMiddleware } from "./middleware/csrfMiddleware";
 import deserializeUser from "./middleware/deserialize";
 import purify from "./middleware/domPurify";
 import sanitizerMongo from "./middleware/sanitize";
@@ -22,7 +21,7 @@ const app = express();
 const port = config.get<number>("port");
 const baseRoute = config.get<string>("baseRoute");
 
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static("public"));
 
 // Security middleware
 const helmetConfig = config.get<object>("helmetConfig");

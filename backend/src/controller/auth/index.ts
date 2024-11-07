@@ -53,14 +53,14 @@ export async function createSessionHandler(
       maxAge: accessTokenTtl,
       httpOnly: true,
       secure: true,
-      sameSite: "lax",
+      sameSite: "strict",
     });
 
     res.cookie("refreshToken", refreshToken, {
       maxAge: refreshTokenTtl,
       httpOnly: true,
       secure: true,
-      sameSite: "lax",
+      sameSite: "strict",
     });
 
     log.info(`User ${user.id} logged in`);
@@ -117,14 +117,14 @@ export async function refreshTokenHandler(req: Request, res: Response) {
     maxAge: accessTokenTtl,
     httpOnly: true,
     secure: true,
-    sameSite: "lax",
+    sameSite: "strict",
   });
 
   res.cookie("refreshToken", newRefreshToken, {
     maxAge: refreshTokenTtl,
     httpOnly: true,
     secure: true,
-    sameSite: "lax",
+    sameSite: "strict",
   });
 
   return res.status(200).json({

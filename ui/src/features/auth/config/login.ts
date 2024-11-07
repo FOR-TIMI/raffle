@@ -12,7 +12,7 @@ export const loginUserAPI = async (
     password,
   });
 
-  return response?.data; // Expecting { accessToken, refreshToken }
+  return response?.data;
 };
 
 export const refreshAccessTokenAPI = async (

@@ -5,7 +5,7 @@
   "main": "backend/src/app.js",
   "scripts": {
     "start": "npm run start-server",
-    "start-server": "node backend/dist/src/app.js",
+    "start-server": "cd backend && npm start",
     "start:local": "concurrently \"cd backend && npm run dev\" \"cd ui && npm start\"",
     "dev": "concurrently \"cd backend && npm run dev\" \"cd ui && npm start\"",
     "install": "cd backend && npm i && cd ../ui && npm i",

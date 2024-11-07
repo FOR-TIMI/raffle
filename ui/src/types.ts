@@ -7,6 +7,15 @@ export interface ResponseState {
   status?: Status;
   error?: Error;
 }
+export interface ValidationErrorMessageType {
+  validation: string;
+  code: string;
+  message: string;
+  path: string[];
+}
+export interface ValidationErrorType {
+  message?: ValidationErrorMessageType[];
+}
 
 export interface User {
   id?: string;

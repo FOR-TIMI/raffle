@@ -35,6 +35,7 @@ const AuthForm: React.FC = () => {
           await dispatch(checkAuthThunk(axios)).unwrap();
           navigate(from, { replace: true });
         } catch (err) {
+          console.log({ err, txt: "My error" });
           dispatch(
             openAlertWithAutoClose(
               err.message || "Something Went wrong",
