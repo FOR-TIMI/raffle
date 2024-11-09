@@ -45,7 +45,7 @@ app.use(cors(corsOptions));
 // Rate limiting
 const rateLimitConfig = config.get<object>("rateLimitConfig");
 const limiter = rateLimit(rateLimitConfig);
-app.use(limiter);
+// app.use(limiter);
 
 // Custom middleware
 app.use(sanitizerMongo());

@@ -23,7 +23,7 @@ export async function createSessionHandler(
     const user = await findUserByEmail(email);
 
     if (!user) {
-      return res.status(200).json({ message: message });
+      return res.status(409).json({ message: message });
     }
 
     if (!user.verifiedEmail) {
@@ -35,7 +35,7 @@ export async function createSessionHandler(
     log.info(`User ${user.id} logged in is valid ${isVaild}`);
 
     if (!isVaild) {
-      return res.status(200).json({
+      return res.status(409).json({
         message,
       });
     }

@@ -10,7 +10,7 @@ export const injectStore = (_store: {
   store = _store;
 };
 
-const BASE_URL = process.env.REACT_APP_BASE_URL || "https://raffle-80la.onrender.com/api";
+const BASE_URL = process.env.REACT_APP_BASE_URL || "/api";
 
 export default axios.create({
   baseURL: BASE_URL,

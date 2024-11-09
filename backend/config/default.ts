@@ -1,5 +1,8 @@
 import helmet from "helmet";
-const allowedOrigins = ["https://raffle-80la.onrender.com"];
+const allowedOrigins = [
+  "https://raffle-80la.onrender.com",
+  "http://localhost:8000",
+];
 
 export default {
   port: 8000,
@@ -10,7 +13,7 @@ export default {
   refreshTokenTtl: "7d",
   accessTokenPrivateKey: "",
   refreshTokenPrivateKey: "",
-  uiBaseUrl: "http://localhost:3000",
+  uiBaseUrl: "http://localhost:8000",
   smtp: {
     user: "hftwu44la5m4ux7g@ethereal.email",
     pass: "xbXyhfPwyd3RXGdwN3",
