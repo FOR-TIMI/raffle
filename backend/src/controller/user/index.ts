@@ -47,8 +47,7 @@ export async function createUserHandler(
               hour12: true,
             })
             .replace(/,/g, "")
-            .replace(" at ", " at ")
-            .toLowerCase() || "",
+            .replace(" at ", " at ") || "",
       }),
     });
 
