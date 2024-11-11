@@ -4,7 +4,7 @@ import * as yup from "yup";
 import axios from "../../../config/api";
 import { USER_API_ROUTES } from "../../../config/constants";
 
-export type RequestBody = {
+export type UserSignupRequestBody = {
   firstName: string;
   lastName: string;
   password: string;
@@ -12,7 +12,7 @@ export type RequestBody = {
   passwordConfirmation: string;
 };
 
-const initialValues: RequestBody = {
+const initialValues: UserSignupRequestBody = {
   firstName: "",
   lastName: "",
   email: "",
@@ -36,13 +36,7 @@ const schema = yup.object().shape({
   email: yup
     .string()
     .email("Invalid email format")
-    .required("Email is required")
-    .test("checkEmail", "Email is already in use", async function (value = "") {
-      if (!yup.string().email().isValidSync(value)) {
-        return true;
-      }
-      return await checkEmailAvailability(value);
-    }),
+    .required("Email is required"),
   password: yup
     .string()
     .matches(
@@ -56,7 +50,7 @@ const schema = yup.object().shape({
     .required("Confirm password is required"),
 });
 
-const signUpApi = async (body: RequestBody): Promise<any> => {
+const signUpApi = async (body: UserSignupRequestBody): Promise<any> => {
   const response = await axios.post(USER_API_ROUTES.SIGNUP, body);
   return response.data;
 };
@@ -93,4 +87,24 @@ const checkEmailAvailability = async (email: string): Promise<boolean> => {
   });
 };
 
-export { initialValues, schema, signUpApi };
+const validateEmailAvailability = async (
+  email: string,
+  setFieldError: (field: string, message: string | undefined) => void
+) => {
+  if (!email) return;
+  if (!yup.string().email().isValidSync(email)) return;
+
+  try {
+    const isAvailable = await checkEmailAvailability(email);
+    if (!isAvailable) {
+      setFieldError("email", "Email is already in use");
+    } else {
+      // Clear the error if the email is available
+      setFieldError("email", undefined);
+    }
+  } catch (err) {
+    setFieldError("email", "Error checking email availability");
+  }
+};
+
+export { initialValues, schema, signUpApi, validateEmailAvailability };

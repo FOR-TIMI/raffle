@@ -27,6 +27,13 @@ type Props = {
   sx?: SxProps;
   type?: "password" | "text";
   variant?: "outlined" | "filled";
+  autoComplete?:
+    | "on"
+    | "off"
+    | "new-password"
+    | "family-name"
+    | "email"
+    | "given-name";
 };
 
 const TextField = React.memo(
@@ -43,6 +50,7 @@ const TextField = React.memo(
     helperText,
     type = "text",
     variant = "filled",
+    autoComplete = "on",
     sx,
   }: Props) => {
     const PRIMARY_COLOR = "#174B30";
@@ -110,6 +118,7 @@ const TextField = React.memo(
       <MuiTextField
         label={labelText}
         type={!!showPassword ? "text" : type}
+        autoComplete={autoComplete}
         onBlur={onBlur}
         onChange={onChange}
         variant={variant}

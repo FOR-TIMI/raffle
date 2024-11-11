@@ -26,6 +26,7 @@ export const alertSlice = createSlice({
     },
     closeAlert: (state) => {
       state.isOpen = false;
+      state.duration = 0;
       state.message = "";
       state.alertType = "info";
     },

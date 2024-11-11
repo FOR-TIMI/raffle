@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { User, ValidationErrorType } from "../../types";
-import { checkAuthThunk, loginUser, logoutUser } from "./authThunk";
+import { checkAuthThunk, loginUser, logoutUser, signUpUser } from "./authThunk";
 
 interface AuthState {
   user: User | null;
@@ -92,6 +92,17 @@ const authSlice = createSlice({
         state.status = "failed";
         state.user = null;
         state.isAuthenticated = false;
+        state.error = action.payload as string;
+      })
+      .addCase(signUpUser.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(signUpUser.fulfilled, (state) => {
+        state.status = "succeeded";
+        state.error = null;
+      })
+      .addCase(signUpUser.rejected, (state, action) => {
+        state.status = "failed";
         state.error = action.payload as string;
       });
   },

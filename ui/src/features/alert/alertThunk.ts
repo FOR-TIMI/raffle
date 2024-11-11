@@ -5,9 +5,12 @@ import { closeAlert, openAlert } from "./alertSlice";
 export const openAlertWithAutoClose =
   (message: string, alertType: AlertColor, duration: number = 3000): AppThunk =>
   (dispatch) => {
-    dispatch(openAlert({ message, alertType }));
+    return new Promise<void>((resolve) => {
+      dispatch(openAlert({ message, alertType }));
 
-    setTimeout(() => {
-      dispatch(closeAlert());
-    }, duration);
+      setTimeout(() => {
+        dispatch(closeAlert());
+        resolve();
+      }, duration);
+    });
   };

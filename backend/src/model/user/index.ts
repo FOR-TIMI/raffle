@@ -9,7 +9,7 @@ import {
   Severity,
 } from "@typegoose/typegoose";
 import argon2 from "argon2";
-import { nanoid } from "nanoid";
+import crypto from "crypto";
 import log from "../../utils/Logger";
 import { Raffle } from "../raffle";
 
@@ -29,7 +29,7 @@ export const privateFields = [
 
   next();
 })
-@index({ email: 1 })
+@index({ email: 1, verificationCodeExpires: 1 }, { expireAfterSeconds: 0 })
 @modelOptions({
   schemaOptions: {
     timestamps: true,
@@ -59,8 +59,11 @@ class User {
   @prop({ required: true })
   password: string;
 
-  @prop({ required: true, default: () => nanoid() })
-  verificationCode: string;
+  @prop({ default: () => crypto.randomBytes(32).toString("hex") })
+  verificationCode: string | undefined;
+
+  @prop({ default: new Date(Date.now() + 3600 * 1000) })
+  verificationCodeExpires: Date | undefined;
 
   @prop()
   passwordResetCode: string | null;

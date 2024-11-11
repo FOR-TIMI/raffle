@@ -4,8 +4,9 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "build": "npm run build:ui && npm run copy:ui && npm run build:backend",
+    "build": "npm run build:ui && npm run copy:ui && npm run build:backend && npm run copy:templates",
     "build:ui": "cd ../ui && npm install && npm run build",
+    "copy:templates": "cpx \"./src/service/mail/Templates/*\" dist/service/mail/Templates",
     "copy:ui": "cpx \"../ui/build/**/*\" public",
     "build:backend": "rimraf dist && tsc && cpx \"public/**/*\" dist/public",
     "prestart": "npm run build",
@@ -24,6 +25,7 @@
     "config": "^3.3.12",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "csurf": "^1.11.0",
     "dayjs": "^1.11.13",
     "dompurify": "^3.1.6",

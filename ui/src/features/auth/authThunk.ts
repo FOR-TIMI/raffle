@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { AxiosInstance } from "axios";
 import { USER_API_ROUTES } from "../../config/constants";
+import { signUpApi, UserSignupRequestBody } from "./config/signup";
 
 export const checkAuthThunk = createAsyncThunk(
   "auth/checkAuth",
@@ -46,3 +47,16 @@ export const logoutUser = createAsyncThunk(
     }
   }
 );
+
+export const signUpUser = createAsyncThunk<
+  { message: string },
+  { body: UserSignupRequestBody },
+  { rejectValue: any }
+>("auth/signup", async ({ body }, { rejectWithValue }) => {
+  try {
+    const data = await signUpApi(body);
+    return data;
+  } catch (error) {
+    return rejectWithValue((error as any).response?.data);
+  }
+});

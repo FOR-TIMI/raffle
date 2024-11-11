@@ -1,3 +1,5 @@
+import config from "config";
+import crypto from "crypto";
 import { Request, Response } from "express";
 import { nanoid } from "nanoid";
 import {
@@ -15,20 +17,39 @@ export async function createUserHandler(
   res: Response
 ) {
   const body = req.body;
+  const payload = {
+    email: body.email.toLowerCase().trim(),
+    firstName: body.firstName.trim(),
+    lastName: body.lastName.trim(),
+    password: body.password,
+  };
 
   try {
-    const user = await createUser({
-      email: body.email.toLowerCase().trim(),
-      firstName: body.firstName.trim(),
-      lastName: body.lastName.trim(),
-      password: body.password,
-    });
+    const user = await createUser(payload);
+    const uiBaseUrl = config.get<string>("uiBaseUrl");
 
-    await MailService.sendEmail({
-      from: "timicancode@gmail.com",
+    MailService.sendEmail({
       to: user.email.trim(),
-      subject: "Please verify your account",
-      text: `Verification code ${user.verificationCode}, Identity ${user.id}`,
+      subject: "Confirm your email",
+      html: MailService.getHtml("verifyEmail", {
+        email: user.email,
+        verificationLink: `${uiBaseUrl}/verify/${user.id}/${user.verificationCode}`,
+        revokeLink: `${uiBaseUrl}/revoke/${user.id}/${user.verificationCode}`,
+        name: user.firstName,
+        validUntil:
+          user?.verificationCodeExpires
+            ?.toLocaleString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              hour: "numeric",
+              minute: "2-digit",
+              hour12: true,
+            })
+            .replace(/,/g, "")
+            .replace(" at ", " at ")
+            .toLowerCase() || "",
+      }),
     });
 
     return res.status(201).json({ message: "User created successfully" });
@@ -36,9 +57,36 @@ export async function createUserHandler(
     if (e.code === 11000) {
       return res.status(409).json({ message: "User already exists" });
     }
-
-    return res.status(500).json({ message: "Internal server error", error: e });
+    return res
+      .status(500)
+      .json({ message: "Internal server error", error: e.message });
   }
+}
+
+export async function verifyEmailHandler(req: Request, res: Response) {
+  const { userId, verificationCode } = req.params;
+
+  const user = await findUserById(userId);
+
+  if (!user || user.verifiedEmail) {
+    return res.status(400).json({ message: "Invalid or expired link" });
+  }
+
+  if (
+    user.verificationCode !== verificationCode ||
+    (user.verificationCodeExpires && user.verificationCodeExpires < new Date())
+  ) {
+    return res
+      .status(400)
+      .json({ message: "Invalid or expired verification code" });
+  }
+
+  user.verifiedEmail = true;
+  user.verificationCode = undefined;
+  user.verificationCodeExpires = undefined;
+  await user.save();
+
+  res.status(200).json({ message: "Email verified successfully" });
 }
 
 export async function verifyUserHandler(
@@ -150,4 +198,34 @@ export async function emailExistsHandler(req: Request, res: Response) {
   }
 
   return res.status(404).json({ message: "Email does not exist" });
+}
+
+export async function resendVerificationEmail(req: Request, res: Response) {
+  const { email } = req.body;
+  const uiBaseUrl = config.get<string>("uiBaseUrl");
+
+  const user = await findUserByEmail(email);
+
+  if (!user || user.verifiedEmail) {
+    return res.status(400).json({ message: "Invalid request" });
+  }
+
+  // Generate new verification code and expiration
+  user.verificationCode = crypto.randomBytes(32).toString("hex");
+  user.verificationCodeExpires = new Date(Date.now() + 3600 * 1000);
+  await user.save();
+
+  // Send verification email
+  MailService.sendEmail({
+    to: user.email.trim(),
+    subject: "Confirm your email",
+    html: MailService.getHtml("verifyEmail", {
+      email: user.email,
+      verificationLink: `${uiBaseUrl}/verify/${user.id}/${user.verificationCode}`,
+      revokeLink: `${uiBaseUrl}/revoke/${user.id}/${user.verificationCode}`,
+      name: user.firstName,
+    }),
+  });
+
+  res.status(200).json({ message: "Verification email resent" });
 }

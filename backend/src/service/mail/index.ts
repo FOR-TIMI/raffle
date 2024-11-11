@@ -1,6 +1,9 @@
 import config from "config";
+import fs from "fs";
 import nodemailer, { SendMailOptions } from "nodemailer";
 import log from "../../utils/Logger";
+
+type EmailTemplate = "verifyEmail" | "forgotPassword" | "resetPassword";
 
 const smtpConfig = config.get<{
   user: string;
@@ -16,10 +19,7 @@ const parsedSmtpConfig = {
     typeof smtpConfig.port === "string"
       ? parseInt(smtpConfig.port)
       : smtpConfig.port,
-  secure:
-    typeof smtpConfig.secure === "string"
-      ? smtpConfig.secure.toLowerCase() === "true"
-      : smtpConfig.secure,
+  secure: String(smtpConfig.secure).toLowerCase() === "true",
 };
 
 // async function createTestCreds() {
@@ -42,6 +42,33 @@ async function sendEmail(payload: SendMailOptions) {
   });
 }
 
+const getHtml = (type: EmailTemplate, data: Record<string, string>): string => {
+  let template = "";
+  let templateHtml = "";
+  switch (type) {
+    case "verifyEmail":
+      template = "verifyEmail.html";
+      break;
+    case "forgotPassword":
+      template = "forgotPassword.html";
+      break;
+  }
+
+  if (template) {
+    const templatePath = `${__dirname}/Templates/${template}`;
+    if (fs.existsSync(templatePath)) {
+      templateHtml = fs
+        .readFileSync(templatePath, "utf8")
+        .replace(/{{([^{}]*)}}/g, (_, key) => data[key]);
+    } else {
+      log.error(`Template file ${templatePath} not found`);
+    }
+  }
+
+  return templateHtml;
+};
+
 export default {
   sendEmail,
+  getHtml,
 };

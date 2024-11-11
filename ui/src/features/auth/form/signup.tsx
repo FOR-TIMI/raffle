@@ -1,10 +1,10 @@
 /** Service */
 import { Formik, FormikHelpers } from "formik";
 import {
-  RequestBody,
+  UserSignupRequestBody,
   initialValues,
   schema,
-  signUpApi,
+  validateEmailAvailability,
 } from "../config/signup";
 
 /** Components */
@@ -19,6 +19,7 @@ import TextField from "../../../components/Common/TextField";
 import { PAGE_ROUTES } from "../../../config/constants";
 import { openAlertWithAutoClose } from "../../../features/alert/alertThunk";
 import { useAppDispatch } from "../../../hooks/useAppDispatch";
+import { signUpUser } from "../authThunk";
 
 /** Component */
 const SignUpForm: React.FC = () => {
@@ -32,29 +33,35 @@ const SignUpForm: React.FC = () => {
   const navigate = useNavigate();
 
   const handleFormSubmit = async (
-    values,
-    onSubmitProp: FormikHelpers<RequestBody>
+    values: UserSignupRequestBody,
+    onSubmitProp: FormikHelpers<UserSignupRequestBody>
   ) => {
     try {
-      const res = await signUpApi(values);
-      if (res.status.toString().startsWith("4")) {
-      } else {
-        dispatch(
-          openAlertWithAutoClose("Verification Email sent", "success", 8000)
-        );
-        navigate(PAGE_ROUTES.LOGIN);
-      }
+      dispatch(signUpUser({ body: values }))
+        .then(async () => {
+          await dispatch(
+            openAlertWithAutoClose("Verification Email Sent", "success", 8000)
+          );
+          onSubmitProp.resetForm();
+          navigate(PAGE_ROUTES.HOME);
+        })
+        .catch((err) => {
+          dispatch(
+            openAlertWithAutoClose(
+              err.message || "Something went wrong",
+              "error",
+              8000
+            )
+          );
+        });
     } catch (err) {
       dispatch(
         openAlertWithAutoClose(
-          !err.response.data.message ? err.message : err.response.data.message,
+          err.message || "Something went wrong",
           "error",
-          3000
+          8000
         )
       );
-      console.error(err);
-    } finally {
-      onSubmitProp.resetForm();
     }
   };
 
@@ -69,24 +76,27 @@ const SignUpForm: React.FC = () => {
   };
 
   return (
-    <>
-      <TransitionAlerts />
-      <Formik
-        initialValues={initialValues}
-        validationSchema={schema}
-        onSubmit={handleFormSubmit}
-      >
-        {({
-          values,
-          errors,
-          touched,
-          handleBlur,
-          handleChange,
-          handleSubmit,
-          isSubmitting,
-          isValid,
-          dirty,
-        }) => (
+    <Formik
+      initialValues={initialValues}
+      validationSchema={schema}
+      onSubmit={handleFormSubmit}
+      validateOnChange={false}
+      validateOnBlur={true}
+    >
+      {({
+        values,
+        errors,
+        touched,
+        handleBlur,
+        handleChange,
+        handleSubmit,
+        isSubmitting,
+        isValid,
+        dirty,
+        setFieldError,
+      }) => (
+        <>
+          <TransitionAlerts />
           <form onSubmit={handleSubmit}>
             <Box>
               <TextField
@@ -97,6 +107,7 @@ const SignUpForm: React.FC = () => {
                 type="text"
                 errors={errors}
                 touched={touched}
+                autoComplete="given-name"
                 labelText="First Name"
               />
 
@@ -107,12 +118,19 @@ const SignUpForm: React.FC = () => {
                 name="lastName"
                 type="text"
                 errors={errors}
+                autoComplete="family-name"
                 touched={touched}
                 labelText="Last Name"
               />
 
               <TextField
-                onBlur={handleBlur}
+                onBlur={async (e) => {
+                  handleBlur(e);
+                  await validateEmailAvailability(
+                    e.target.value,
+                    setFieldError
+                  );
+                }}
                 onChange={handleChange}
                 value={values.email}
                 name="email"
@@ -120,6 +138,7 @@ const SignUpForm: React.FC = () => {
                 errors={errors}
                 touched={touched}
                 labelText="Email Address"
+                autoComplete="email"
               />
 
               <TextField
@@ -133,6 +152,7 @@ const SignUpForm: React.FC = () => {
                 errors={errors}
                 touched={touched}
                 labelText="Password"
+                autoComplete="new-password"
               />
 
               <TextField
@@ -146,6 +166,7 @@ const SignUpForm: React.FC = () => {
                 errors={errors}
                 touched={touched}
                 labelText="Confirm Password"
+                autoComplete="new-password"
               />
             </Box>
 
@@ -197,9 +218,9 @@ const SignUpForm: React.FC = () => {
               <TiLink variant="link" to={PAGE_ROUTES.LOGIN} text="Sign In" />
             </Box>
           </form>
-        )}
-      </Formik>
-    </>
+        </>
+      )}
+    </Formik>
   );
 };
 
